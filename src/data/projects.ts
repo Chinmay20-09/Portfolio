@@ -126,7 +126,7 @@ export const projects: Project[] = [
     slug: "viewerpal",
     tagline: "Offline-first Android document environment",
     description: "ViewerPal is a Flutter document environment built around the flow FILE → DETECT → ROUTE → VIEW → SAVE-AS → SHARE. Its README documents PDF viewing and sharing, DOCX viewing with search and zoom, XLSX sheet viewing with cell-value editing and Save As, and PPTX slide-text navigation. Editing support differs by format; this is not a full Office replacement.",
-    status: "beta",
+    status: "alpha",
     roadmapStage: "Archived",
     version: "MVP",
     platform: "Android",
