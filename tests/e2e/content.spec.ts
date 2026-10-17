@@ -38,6 +38,22 @@ test.describe('"Notes from the build" activity feed', () => {
     }
   });
 
+  test('becomes visible once scrolled into view', async ({ page }) => {
+    for (const width of [390, 1280]) {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+      await page.goto('./');
+      await waitForReady(page);
+
+      const container = page.locator('#activity .activity-timeline-container');
+      await expect(container).toHaveCSS('opacity', '0');
+
+      await page.locator('#activity').scrollIntoViewIfNeeded();
+      await expect(container).toHaveClass(/appear/, { timeout: 5000 });
+      await expect.poll(async () => Number(await container.evaluate(el => getComputedStyle(el).opacity))).toBe(1);
+      await expect(page.locator('#activity-timeline-wrapper .activity-card').first()).toBeVisible();
+    }
+  });
+
   test('does not advertise releases that were never published', async ({ page }) => {
     await page.goto('./');
     await waitForReady(page);

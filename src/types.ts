@@ -47,6 +47,7 @@ export interface Project {
   platformIcon: string;
   progress: number;
   lastUpdated: string;
+  repositoryCreatedAt?: string;
   colorTheme?: string;
   accentColor?: string;
   githubUrl: string;

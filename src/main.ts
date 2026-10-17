@@ -78,15 +78,25 @@ function animateCountUp(element: HTMLElement, target: number) {
    SCROLL INTERSECTION REVEALS
    ========================================================================== */
 function initScrollAnimations() {
-  const cards = document.querySelectorAll(".animate-on-scroll");
-  
+  const cards = document.querySelectorAll<HTMLElement>(".animate-on-scroll");
+
+  // Without IntersectionObserver every reveal would stay at opacity 0.
+  if (typeof IntersectionObserver === "undefined") {
+    cards.forEach(card => card.classList.add("appear"));
+    return;
+  }
+
+  // A percentage threshold can never be reached by elements taller than the
+  // viewport, which left the long activity feed permanently transparent.
+  // Reveal as soon as any part of the element enters the viewport.
   const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add("appear");
+        scrollObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.05 });
+  }, { threshold: 0, rootMargin: "0px 0px -10% 0px" });
 
   cards.forEach(card => scrollObserver.observe(card));
 }
