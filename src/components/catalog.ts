@@ -11,14 +11,16 @@ export function renderProjectCatalog() {
   
   // Apply Search & Filter rules
   const filtered = projects.filter(proj => {
-    // Filter type checking
-    if (state.activeFilter === "current") {
-      if (proj.status === "archived" || proj.roadmapStage === "Released") return false;
-    } else if (state.activeFilter === "released") {
-      if (proj.roadmapStage !== "Released") return false;
-    } else if (state.activeFilter === "archived") {
-      if (proj.status !== "archived") return false;
+    
+    // Keep archived projects out of the normal catalogue; show them only on Archived.
+    if (state.activeFilter === "archived") {
+      if (proj.status !== "archived" && proj.roadmapStage !== "Archived") return false;
+    } else {
+      if (proj.status === "archived" || proj.roadmapStage === "Archived") return false;
+      if (state.activeFilter === "current" && proj.roadmapStage === "Released") return false;
+      if (state.activeFilter === "released" && proj.roadmapStage !== "Released") return false;
     }
+
     
     // Search query checking
     if (state.searchQuery) {
@@ -697,7 +699,7 @@ export function renderProjectPage(projectId: string) {
       <p class="text-emerald-400">✓ connection established securely // secure_rsa_ssl_sha256</p>
       <p>&gt; fetching latest commit pointers from branch: "main"</p>
       <p class="text-[rgba(255,255,255,0.5)] pl-2">commit_hash: 5ef3a1b3df6672a90098fbc18d2290f01a ${project.lastUpdated}</p>
-      <p class="text-[rgba(255,255,255,0.5)] pl-2">author: Chinmay Kolte &lt;chinmaykolte69@gmail.com&gt;</p>
+      <p class="text-[rgba(255,255,255,0.5)] pl-2">author: Chinmay Kolte &lt;chinmaykolte.work@gmail.com&gt;</p>
       <p class="text-emerald-400">&gt; pipeline build status: SUCCESSFUL // production build ready</p>
       <p class="text-orange-400 pl-2">warnings: 0 // errors: 0 // modules compiled: 42</p>
       <p class="text-emerald-500 animate-pulse">&gt; waiting for localized download signals (sys_awake)...</p>

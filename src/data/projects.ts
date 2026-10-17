@@ -2,307 +2,325 @@ import { Project } from '../types';
 
 export const projects: Project[] = [
   {
-    id: "axisflow",
-    name: "AxisFlow",
-    slug: "axisflow",
-    tagline: "High-Throughput Autonomous AI Agent & Workflow Orchestrator",
-    description: "AxisFlow is a low-latency workflow orchestrator designed to deploy, monitor, and scale complex multi-agent AI loops. It utilizes a stateful node grid to visualize model routing, memory injection, and dynamic tool calls, providing an engineering dashboard to oversee automation loops in real time.",
-    status: "beta",
-    roadmapStage: "Testing",
-    version: "v0.9.2-rc1",
-    platform: "Web & CLI",
-    platformIcon: "laptop",
-    progress: 88,
-    lastUpdated: "2026-07-10",
-    colorTheme: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
-    accentColor: "#58A6FF",
-    githubUrl: "https://github.com/Chinmay20-09/axisflow",
-    bugReportUrl: "https://github.com/Chinmay20-09/axisflow/issues/new?labels=bug",
-    featureRequestUrl: "https://github.com/Chinmay20-09/axisflow/issues/new?labels=enhancement",
-    documentationUrl: "https://github.com/Chinmay20-09/axisflow/wiki",
-    projectPageUrl: "https://axisflow.kolte.dev",
-    currentlyShipping: true,
-    expectedNextRelease: "August 2026",
-    problem: "Orchestrating multi-agent AI pipelines is plagued by latency, loss of state, and invisible token overhead. Developers lack interactive visibility into tool invocation loops and real-time cost-performance optimization.",
-    solution: "AxisFlow introduces an event-driven orchestrator with a stateful node-mesh layout that tracks agent memory injection, provides self-healing backtrack hooks, and monitors performance in real-time.",
-    downloadAssets: {
-      windows: "https://github.com/Chinmay20-09/axisflow/releases/download/v0.9.2/axisflow-setup.exe",
-      mac: "",
-      linux: "https://github.com/Chinmay20-09/axisflow/releases/download/v0.9.2/axisflow-linux.tar.gz",
-      android: "",
-      cli: "npm install -g @axisflow/cli"
-    },
-    expectedFeatures: [
-      "Dynamic Multi-Agent Mesh Router",
-      "Local vector storage integration (HNSW)",
-      "Real-time token and state telemetry dashboards",
-      "Self-healing workflows with automatic backtrack"
-    ],
-    techStack: [
-      { category: "Core Engine", name: "TypeScript / Node.js", badge: "Runtime" },
-      { category: "Database & Index", name: "PostgreSQL & SQLite", badge: "Relational" },
-      { category: "AI Layer", name: "@google/genai SDK", badge: "LLM Orchestration" },
-      { category: "Realtime", name: "WebSockets / SSE", badge: "Streaming" }
-    ],
-    knownIssues: [
-      "Slight memory overhead during 100+ concurrent state-machine ticks",
-      "Draft UI layout artifacts on Safari mobile engine"
-    ],
-    changelog: [
-      {
-        version: "v0.9.2-rc1",
-        date: "2026-07-10",
-        added: [
-          "Integrated @google/genai SDK for native, server-side Gemini function calling.",
-          "Added real-time cost and latency estimation counters to node views."
-        ],
-        improved: [
-          "Optimized system memory usage in long loop processes."
-        ],
-        fixed: [
-          "Fixed SQLite thread locks on massive multi-agent writing loops."
-        ]
-      },
-      {
-        version: "v0.9.0-alpha",
-        date: "2026-05-18",
-        added: [
-          "Core system initial release.",
-          "Visual state designer framework integration."
-        ],
-        improved: [
-          "Engine support for parallel DAG executions."
-        ],
-        fixed: []
-      }
-    ],
-    faq: [
-      { q: "Is AxisFlow open-source?", a: "Yes, AxisFlow is completely open-source and licensed under the Apache-2.0 license." },
-      { q: "Can I run AxisFlow offline?", a: "Absolutely! You can run the orchestrator and coordinate local workflows utilizing offline Ollama or llama.cpp runtimes." },
-      { q: "How does the self-healing layout work?", a: "When a node task crashes or receives empty models output, the orchestrator triggers customized backtrack hook rules to fallback to previous node states." }
-    ],
-    gallery: [
-      { title: "Mesh Router Board Diagram", url: "" },
-      { title: "Telemetry Cost Dashboard View", url: "" }
-    ]
-  },
-  {
     id: "sarthi",
     name: "Sarthi",
     slug: "sarthi",
-    tagline: "Localized Multi-lingual AI Assistant Co-pilot",
-    description: "Sarthi is an offline-capable conversational co-pilot engineered specifically for regional Indian languages. Running lightweight quantized models locally on-device, Sarthi helps users parse document templates, voice-transcribe dialogues, and automate localized actions without needing high-bandwidth cloud routing.",
-    status: "alpha",
-    roadmapStage: "Development",
-    version: "v0.4.5-dev",
-    platform: "Android & Web",
-    platformIcon: "smartphone",
-    progress: 65,
-    lastUpdated: "2026-07-01",
-    colorTheme: "linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)",
-    accentColor: "#FF7B72",
-    githubUrl: "https://github.com/Chinmay20-09/sarthi",
-    bugReportUrl: "https://github.com/Chinmay20-09/sarthi/issues/new?labels=bug",
-    featureRequestUrl: "https://github.com/Chinmay20-09/sarthi/issues/new?labels=enhancement",
-    documentationUrl: "",
-    projectPageUrl: "",
-    currentlyShipping: false,
-    expectedNextRelease: "October 2026",
-    problem: "Many rural areas lack high-bandwidth internet connections, yet require intelligent assistant solutions to parse regional templates, OCR scans, and voice commands.",
-    solution: "Sarthi bundles lightweight on-device inference engines (such as Whisper.cpp and ONNX Runtime Mobile) directly inside a cross-platform Flutter app, delivering seamless multilingual assistance 100% offline.",
-    downloadAssets: {
-      windows: "",
-      mac: "",
-      linux: "",
-      android: "https://github.com/Chinmay20-09/sarthi/releases/download/v0.4.5/sarthi-beta.apk",
-      cli: ""
-    },
-    expectedFeatures: [
-      "Quantized On-Device LLM Pipeline (Llama 3 8B Int4)",
-      "High-accuracy voice-to-text engines in 8 regional languages",
-      "Offline translation and OCR file scanning templates",
-      "Intelligent text-to-speech with local audio synthesis"
-    ],
-    techStack: [
-      { category: "Frontend", name: "Flutter / Dart", badge: "Cross-platform UI" },
-      { category: "Inference Engine", name: "ONNX Runtime Mobile", badge: "On-Device AI" },
-      { category: "Local Speech", name: "Whisper.cpp", badge: "Voice Parsing" },
-      { category: "Database", name: "Isar Database", badge: "Secure Cache" }
-    ],
-    knownIssues: [
-      "Inference thermal throttle on mid-range Android chips under long loops",
-      "Audio playback latency on Android devices older than API level 28"
-    ],
-    changelog: [
-      {
-        version: "v0.4.5-dev",
-        date: "2026-07-01",
-        added: [
-          "Implemented native Whisper speech voice models with custom vocab lists.",
-          "Created modular audio recording buffer manager."
-        ],
-        improved: [
-          "Optimized ONNX weight loading times by 40% using memory maps."
-        ],
-        fixed: []
-      }
-    ],
-    faq: [
-      { q: "Which regional Indian languages are supported?", a: "Sarthi supports Hindi, Marathi, Gujarati, Bengali, Tamil, Telugu, Kannada, and Malayalam." },
-      { q: "Does Sarthi send my voice to any external server?", a: "No! All audio recording and Whisper transcriptions are completed locally on-device without any network connections." }
-    ],
-    gallery: [
-      { title: "ASR Speech Waveform Monitor", url: "" },
-      { title: "Offline Multi-lingual Dialogue Sandbox", url: "" }
-    ]
-  },
-  {
-    id: "master-controller",
-    name: "Master Controller",
-    slug: "master-controller",
-    tagline: "Infrastructure Health & Network Dashboard Node",
-    description: "An automated infrastructure and telemetry health dashboard. Master Controller monitors microservices, server metrics, network packet drops, and cloud instances, dispatching emergency alerts via Discord and email before incidents escalate.",
+    tagline: "Local-first AI desktop assistant with speech, app discovery, and modular skills",
+    description: "Sarthi is a local-first Windows desktop assistant that interprets natural-language and voice commands, discovers installed applications, resolves entities with fuzzy matching, and executes tasks through a modular skill system. Its repository README describes the 1.0.4 Hyperion build with a FastAPI service and a local web UI.",
     status: "stable",
     roadmapStage: "Released",
-    version: "v2.1.0",
-    platform: "Linux, macOS & Web",
-    platformIcon: "laptop",
+    version: "1.0.4 Hyperion",
+    platform: "Windows Desktop & Web UI",
+    platformIcon: "monitor",
     progress: 100,
-    lastUpdated: "2026-06-25",
-    colorTheme: "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)",
-    accentColor: "#BC8CFF",
-    githubUrl: "https://github.com/Chinmay20-09/master-controller",
-    bugReportUrl: "https://github.com/Chinmay20-09/master-controller/issues",
-    featureRequestUrl: "https://github.com/Chinmay20-09/master-controller/issues",
-    documentationUrl: "https://github.com/Chinmay20-09/master-controller/docs",
-    projectPageUrl: "https://mc.kolte.dev",
-    currentlyShipping: false,
-    expectedNextRelease: "Fully Released",
-    problem: "Monitoring microservices and server clusters usually requires heavy agents like Prometheus/Grafana which consume massive system resources on tiny VPS nodes.",
-    solution: "Master Controller is a lightweight compiled Go binary that queries system sockets, sniffing packet metrics in microseconds, and serves a modern, tiny Svelte-based frontend dashboard.",
-    downloadAssets: {
-      windows: "https://github.com/Chinmay20-09/master-controller/releases/download/v2.1.0/mc-setup.msi",
-      mac: "https://github.com/Chinmay20-09/master-controller/releases/download/v2.1.0/mc-darwin-dmg",
-      linux: "https://github.com/Chinmay20-09/master-controller/releases/download/v2.1.0/mc-linux-amd64",
-      android: "",
-      cli: "curl -sS https://mc.kolte.dev/install.sh | sh"
-    },
+    lastUpdated: "2026-10-16",
+    colorTheme: "linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)",
+    accentColor: "#A78BFA",
+    githubUrl: "https://github.com/Chinmay20-09/Sarthi",
+    bugReportUrl: "https://github.com/Chinmay20-09/Sarthi/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/Sarthi/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/Sarthi#readme",
+    currentlyShipping: true,
+    problem: "Desktop workflows often require switching between apps and remembering commands, while generic assistants lack reliable local application discovery and task execution.",
+    solution: "A local-first command pipeline combines speech recognition, intent interpretation, entity resolution, application launching, and pluggable skills in a desktop assistant.",
     expectedFeatures: [
-      "Custom prometheus and grafana integration bridges",
-      "Instant TCP/HTTP packet drop sniffing alert models",
-      "Secure webhook pipelines with automated deployment fallback scripts",
-      "Memory, disk, and CPU alert triggers with auto-cleanup loops"
+      "Whisper-based speech recognition and voice command flow",
+      "Automatic discovery of installed applications and websites",
+      "Fuzzy entity matching and application launching",
+      "Modular skills for automation, browser workflows, and project tracking",
+      "FastAPI service and local web UI"
     ],
     techStack: [
-      { category: "Backend Node", name: "Go (Golang)", badge: "Core Engine" },
-      { category: "Web Dashboard", name: "Svelte & Tailwind", badge: "Dashboard UI" },
-      { category: "Database", name: "TimescaleDB / Redis", badge: "Time-series Storage" },
-      { category: "Alert Systems", name: "Discord & Slack Webhooks", badge: "Notifications" }
+      { category: "Core", name: "Python", badge: "Assistant Engine" },
+      { category: "API", name: "FastAPI", badge: "Local Service" },
+      { category: "Speech", name: "Whisper / faster-whisper", badge: "Transcription" },
+      { category: "Resolution", name: "RapidFuzz", badge: "Entity Matching" }
     ],
-    knownIssues: [
-      "Higher CPU usage on single-core setups with 10,000+ monitored metrics",
-      "TimescaleDB vacuum operations temporarily delay API read routes"
+    knownIssues: [],
+    changelog: [],
+    faq: [],
+    gallery: []
+  },
+  {
+    id: "eventflow",
+    name: "EventFlow",
+    slug: "eventflow",
+    tagline: "Crowd-flow simulation and decision support for large events",
+    description: "EventFlow models a venue and surrounding area as a graph, simulates crowd movement, detects or forecasts congestion, generates mitigation strategies, tests candidate strategies in a sandbox, and presents ranked options to an operator. Consequential changes remain behind human approval.",
+    status: "beta",
+    roadmapStage: "Testing",
+    version: "Prototype",
+    platform: "Web & Backend",
+    platformIcon: "network",
+    progress: 65,
+    lastUpdated: "2026-09-29",
+    colorTheme: "linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%)",
+    accentColor: "#2DD4BF",
+    githubUrl: "https://github.com/Chinmay20-09/EventFlow",
+    bugReportUrl: "https://github.com/Chinmay20-09/EventFlow/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/EventFlow/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/EventFlow#readme",
+    currentlyShipping: false,
+    problem: "Event organizers need to anticipate crowd bottlenecks and compare response options before a real-world incident escalates.",
+    solution: "A decision-support workflow connects graph-based crowd simulation, congestion analysis, sandboxed mitigation strategies, and an operator dashboard for reviewing recommendations.",
+    expectedFeatures: [
+      "Venue graph and crowd-flow simulation",
+      "Congestion detection and forecasting",
+      "Candidate mitigation strategies tested in a sandbox",
+      "Ranked recommendations for operator review",
+      "Organizer interface connected to the backend API"
     ],
-    changelog: [
-      {
-        version: "v2.1.0",
-        date: "2026-06-25",
-        added: [
-          "Added raw packet drop sniffing widgets on visual network maps."
-        ],
-        improved: [
-          "Upgraded Go metrics sniffer engine using fast concurrent thread channels."
-        ],
-        fixed: [
-          "Resolved Redis memory leak during continuous high-rate TCP health queries."
-        ]
-      },
-      {
-        version: "v2.0.0",
-        date: "2026-04-12",
-        added: [
-          "Complete rewritten core engine in Go for sub-millisecond telemetry loops.",
-          "Added Svelte visual web console with beautiful grid filters."
-        ],
-        improved: [],
-        fixed: []
-      }
+    techStack: [
+      { category: "Frontend", name: "TypeScript / Vite", badge: "Web UI" },
+      { category: "Backend", name: "Python / FastAPI", badge: "API Layer" },
+      { category: "Persistence", name: "PostgreSQL", badge: "Data Store" }
     ],
-    faq: [
-      { q: "How many servers can a single Master Controller monitor?", a: "A single instance can easily track up to 500 remote target nodes running our lightweight metrics client script." },
-      { q: "Does Master Controller support third-party alerting integrations?", a: "Yes, out-of-the-box alerting rules support Discord webhooks, Slack channels, Telegram bots, and standard SMTP emails." }
+    knownIssues: [],
+    changelog: [],
+    faq: [],
+    gallery: []
+  },
+  {
+    id: "axisflow",
+    name: "AxisFlow",
+    slug: "axisflow",
+    tagline: "Personal finance and transaction tracking for everyday spending",
+    description: "AxisFlow is a Flutter personal-finance application focused on transaction tracking, budgets, and spending insights. It uses a local Hive data layer and Supabase authentication, with CSV import/export and an SMS transaction-detection pipeline. Android SMS permission and device behavior need careful validation.",
+    status: "alpha",
+    roadmapStage: "Development",
+    version: "MVP in progress",
+    platform: "Android",
+    platformIcon: "smartphone",
+    progress: 55,
+    lastUpdated: "2026-08-22",
+    colorTheme: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+    accentColor: "#60A5FA",
+    githubUrl: "https://github.com/Chinmay20-09/AxisFlow",
+    bugReportUrl: "https://github.com/Chinmay20-09/AxisFlow/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/AxisFlow/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/AxisFlow",
+    currentlyShipping: false,
+    problem: "Tracking spending across bank messages and manual entries is repetitive, and it can be hard to spot patterns or stay within a budget.",
+    solution: "A mobile transaction tracker combines local records, budget views, CSV workflows, and analytics to make personal spending easier to review.",
+    expectedFeatures: [
+      "Transaction tracking and categorization",
+      "Budgeting and spending analytics",
+      "CSV import and export",
+      "Hive-backed local storage",
+      "Supabase authentication",
+      "SMS-based transaction detection with permission-aware handling"
     ],
-    gallery: [
-      { title: "Dynamic Services Grid View", url: "" },
-      { title: "Real-time Metrics Tracking Diagram", url: "" }
-    ]
+    techStack: [
+      { category: "Application", name: "Flutter / Dart", badge: "Mobile App" },
+      { category: "Local Data", name: "Hive", badge: "On-device Storage" },
+      { category: "Authentication", name: "Supabase", badge: "Auth" }
+    ],
+    knownIssues: ["SMS permission and Play Protect behavior should be validated on target Android devices"],
+    changelog: [],
+    faq: [],
+    gallery: []
+  },
+  {
+    id: "viewerpal",
+    name: "ViewerPal",
+    slug: "viewerpal",
+    tagline: "Offline-first Android document environment",
+    description: "ViewerPal is a Flutter document environment built around the flow FILE → DETECT → ROUTE → VIEW → SAVE-AS → SHARE. Its README documents PDF viewing and sharing, DOCX viewing with search and zoom, XLSX sheet viewing with cell-value editing and Save As, and PPTX slide-text navigation. Editing support differs by format; this is not a full Office replacement.",
+    status: "beta",
+    roadmapStage: "Archived",
+    version: "MVP",
+    platform: "Android",
+    platformIcon: "file-text",
+    progress: 70,
+    lastUpdated: "2026-09-30",
+    colorTheme: "linear-gradient(135deg, #7c3aed 0%, #db2777 100%)",
+    accentColor: "#C084FC",
+    githubUrl: "https://github.com/Chinmay20-09/viewerpal",
+    bugReportUrl: "https://github.com/Chinmay20-09/viewerpal/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/viewerpal/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/viewerpal#readme",
+    currentlyShipping: false,
+    problem: "Document formats can require separate viewers, and online conversion or cloud accounts are not always suitable for a private offline workflow.",
+    solution: "A unified Android-first app routes picked documents to format-specific viewing engines and provides save/share actions where implemented, without cloud conversion.",
+    expectedFeatures: [
+      "Android system document picker and file-type detection",
+      "PDF paging and sharing",
+      "DOCX rendering with search and zoom",
+      "XLSX sheet tabs, cell-value editing, and Save As",
+      "PPTX slide text and navigation",
+      "Safe handling of unsupported files"
+    ],
+    techStack: [
+      { category: "Application", name: "Flutter / Dart", badge: "Mobile UI" },
+      { category: "Platform", name: "Android SAF", badge: "Document Access" }
+    ],
+    knownIssues: ["Editing and saving support differs by format; PDF, DOCX, and PPTX editing are not documented as supported"],
+    changelog: [],
+    faq: [],
+    gallery: []
+  },
+  {
+    id: "deskbuddy",
+    name: "DeskBuddy",
+    slug: "deskbuddy",
+    tagline: "Privacy-first ambient AI desktop companion",
+    description: "DeskBuddy is an evolving desktop companion with a Next.js/React/TypeScript frontend, a Java Spring Boot backend, and PostgreSQL persistence with migrations. The repository describes the architecture and launch workflow; consult its documentation to confirm which assistant features are implemented versus planned.",
+    status: "alpha",
+    roadmapStage: "Ideas",
+    version: "In development",
+    platform: "Web & Backend",
+    platformIcon: "brain-circuit",
+    progress: 40,
+    lastUpdated: "2026-08-09",
+    colorTheme: "linear-gradient(135deg, #334155 0%, #0f766e 100%)",
+    accentColor: "#5EEAD4",
+    githubUrl: "https://github.com/Chinmay20-09/Deskbuddy",
+    bugReportUrl: "https://github.com/Chinmay20-09/Deskbuddy/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/Deskbuddy/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/Deskbuddy#readme",
+    currentlyShipping: false,
+    problem: "Desktop companion tools need a clear path from a responsive interface to durable backend services while keeping user data under deliberate control.",
+    solution: "A separated web frontend and Spring Boot service, backed by PostgreSQL migrations, provide a foundation for a privacy-minded desktop companion.",
+    expectedFeatures: [
+      "Next.js and React desktop-oriented interface",
+      "Spring Boot backend service",
+      "PostgreSQL persistence and database migrations",
+      "Documented local development and startup workflow"
+    ],
+    techStack: [
+      { category: "Frontend", name: "Next.js / React / TypeScript", badge: "Web UI" },
+      { category: "Backend", name: "Java / Spring Boot", badge: "Service Layer" },
+      { category: "Database", name: "PostgreSQL", badge: "Persistence" }
+    ],
+    knownIssues: [],
+    changelog: [],
+    faq: [],
+    gallery: []
   },
   {
     id: "lakshman-rekha",
     name: "Lakshman Rekha",
     slug: "lakshman-rekha",
-    tagline: "Local Privacy Shield & DNS Network Blocker",
-    description: "Lakshman Rekha is a security-first network packet scanner and DNS blocker. Running locally, it blocks tracker domains, malicious adware, and telemetry leaks while compiling local graphs on which external server nodes your machines are silently communicating with.",
-    status: "paused",
+    tagline: "ESP32-based IoT emergency-alert prototype",
+    description: "Lakshman Rekha is an IoT safety prototype exploring sensor-triggered emergency alerts using an ESP32 and MQTT messaging. It is a prototype/hackathon project, not a finished consumer safety product; consult the repository for current hardware wiring and implemented sensor behavior.",
+    status: "alpha",
     roadmapStage: "Planning",
-    version: "v0.1.2-beta",
-    platform: "Linux / CLI",
-    platformIcon: "terminal",
+    version: "Prototype",
+    platform: "ESP32 / IoT",
+    platformIcon: "cpu",
     progress: 30,
-    lastUpdated: "2026-05-10",
+    lastUpdated: "2026-08-08",
     colorTheme: "linear-gradient(135deg, #4A0E4E 0%, #0D0D0D 100%)",
-    accentColor: "#F0883E",
-    githubUrl: "https://github.com/Chinmay20-09/lakshman-rekha",
-    bugReportUrl: "https://github.com/Chinmay20-09/lakshman-rekha/issues",
-    featureRequestUrl: "https://github.com/Chinmay20-09/lakshman-rekha/issues",
-    documentationUrl: "",
-    projectPageUrl: "",
+    accentColor: "#F59E0B",
+    githubUrl: "https://github.com/Chinmay20-09/Lakshman-rekha",
+    bugReportUrl: "https://github.com/Chinmay20-09/Lakshman-rekha/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/Lakshman-rekha/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/Lakshman-rekha",
     currentlyShipping: false,
-    expectedNextRelease: "Q4 2026",
-    problem: "Most tracking and adware domains leak data silently in the background, consuming networking bandwidth and violating system privacy parameters without users knowing.",
-    solution: "Lakshman Rekha establishes a low-level local DNS proxy that filters DNS lookups through a compiled blocker ledger, using eBPF kernel adapters to map out active tracking nodes.",
-    downloadAssets: {
-      windows: "",
-      mac: "",
-      linux: "https://github.com/Chinmay20-09/lakshman-rekha/releases/download/v0.1.2/lr-cli-linux-amd64",
-      android: "",
-      cli: ""
-    },
+    problem: "A safety incident may require a fast way to communicate an alert from sensor input without depending on someone manually initiating every step.",
+    solution: "An ESP32 prototype combines sensor input and MQTT messaging as a base for emergency-alert workflows that can be demonstrated and extended.",
     expectedFeatures: [
-      "Highly performant local DNS forwarding core",
-      "Tracker rules compilation with auto-update loops",
-      "Network adapter traffic graphing and domain sniffing",
-      "Local hosts sandbox rule control panel"
+      "ESP32-based sensor integration",
+      "MQTT message delivery for alert events",
+      "Emergency-alert prototype workflow",
+      "Hardware and firmware testing for an IoT context"
     ],
     techStack: [
-      { category: "System Core", name: "Rust", badge: "Low-level Systems" },
-      { category: "Network Packet", name: "libpcap / eBPF", badge: "Kernel Hook" },
-      { category: "Configuration", name: "SQLite", badge: "Local Storage" },
-      { category: "Console Client", name: "Cursive TUI", badge: "Terminal UI" }
+      { category: "Hardware", name: "ESP32", badge: "Microcontroller" },
+      { category: "Messaging", name: "MQTT", badge: "Event Transport" },
+      { category: "Sensors", name: "Sensor Modules", badge: "Input" }
+    ],
+    knownIssues: ["Prototype status: sensor selection, wiring, connectivity, and alert delivery need validation on target hardware"],
+    changelog: [],
+    faq: [],
+    gallery: []
+  },
+  {
+    id: "astral-monitor",
+    name: "Astral-Monitor",
+    slug: "astral-monitor",
+    tagline: "Cyber attack detection and safe-command gateway for satellite ground stations",
+    description: "Astral-Monitor (ST-02) is a controlled, local-only spacecraft-security simulation. A React operator console sends command intents to a Node.js/Express backend, where the gateway applies credential checks, HMAC-SHA256 integrity/authentication, AES-GCM encryption validation, replay protection, behavioral and mission-context analysis, risk scoring, deterministic safety policy, and explainable audit persistence in SQLite. The project explicitly has no real satellite integration and is not production security software.",
+    status: "beta",
+    roadmapStage: "Testing",
+    version: "v1.1.0",
+    platform: "Local Web Simulation",
+    platformIcon: "shield-check",
+    progress: 75,
+    lastUpdated: "2026-10-06",
+    colorTheme: "linear-gradient(135deg, #0f172a 0%, #0f766e 100%)",
+    accentColor: "#2DD4BF",
+    githubUrl: "https://github.com/Chinmay20-09/Astral-Monitor",
+    bugReportUrl: "https://github.com/Chinmay20-09/Astral-Monitor/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/Astral-Monitor/issues",
+    documentationUrl: "https://github.com/Chinmay20-09/Astral-Monitor#readme",
+    currentlyShipping: true,
+    problem: "Satellite ground-station command paths are high-consequence interfaces. Unauthorized, replayed, tampered, or contextually unsafe command traffic must be identified before a command can be accepted by the simulated spacecraft environment.",
+    solution: "Astral-Monitor places a backend-enforced security gateway between the operator console and the simulated command path. The backend owns credentials, cryptographic validation, replay state, policy decisions, spacecraft/mission state, and durable audit events; the browser sends intents without holding the key registry.",
+    expectedFeatures: [
+      "Backend-owned credential registry and command authentication",
+      "HMAC-SHA256 integrity/authentication and AES-GCM-256 encrypted command handling",
+      "Replay protection with nonce, monotonic sequence, and timestamp window",
+      "Behavioral sequence analysis and mission-context flight rules",
+      "Contextual risk score and deterministic block/allow/safe-mode policy",
+      "Attack simulator for tampering, unauthorized injection, replay, credential compromise, destructive burn, and eavesdropping scenarios",
+      "Explainable security-event audit trail persisted in SQLite",
+      "Operator recovery workflow and simulated spacecraft state console"
+    ],
+    techStack: [
+      { category: "Frontend", name: "React / TypeScript / Vite", badge: "Operator Console" },
+      { category: "Backend", name: "Node.js / Express", badge: "Security Gateway" },
+      { category: "Persistence", name: "SQLite", badge: "Audit & State" },
+      { category: "Cryptography", name: "HMAC-SHA256 / AES-GCM-256", badge: "Integrity & Confidentiality" },
+      { category: "Testing", name: "Vitest / TypeScript checks", badge: "Validation" }
     ],
     knownIssues: [
-      "eBPF routing requires superuser privileges under standard Linux setups",
-      "Temporary packet drops when rewriting local system loop routes"
+      "Local simulation only: no real spacecraft or ground-station integrations; not production security software",
+      "Current-state notes say the credential-compromise-to-SAFE_MODE path still needs a correctly HMAC-signed browser/demo validation",
+      "Demo Mode and attacker-side audit timeline behavior still need end-to-end browser verification"
     ],
     changelog: [
       {
-        version: "v0.1.2-beta",
-        date: "2026-05-10",
-        added: [
-          "Draft low-level DNS parser using Rust trust-dns library."
-        ],
-        improved: [
-          "Implemented basic hosts list crawler and cache compiler."
-        ],
-        fixed: []
+        version: "v1.1.0",
+        date: "2026-10-06",
+        changes: [
+          "Current-state notes record backend attack-path checks, persistent event IDs, recovery-path checks, and TypeScript validation.",
+          "Some safe-mode demonstration and browser verification items remain open; consult the repository current-state notes."
+        ]
       }
     ],
     faq: [
-      { q: "Is superuser (root) privilege required?", a: "Yes, eBPF kernel hooks and low-level socket listening (port 53) require superuser authorization on standard Linux distributions." },
-      { q: "How are blocking filters maintained?", a: "Blocks are compiled and aggregated hourly from multiple highly secure, trusted tracking filter ledgers." }
+      { q: "Does Astral-Monitor connect to real satellites?", a: "No. It is explicitly documented as a controlled local simulation for research and demonstration." },
+      { q: "Does Astral-Monitor use asymmetric digital signatures?", a: "No. The README deliberately describes HMAC-SHA256 as a symmetric message authentication code; AES-GCM-256 is used for authenticated encryption." }
     ],
-    gallery: [
-      { title: "TUI Interface Main Grid", url: "" }
-    ]
+    gallery: []
+  },
+  {
+    id: "master-controller",
+    name: "Master Controller",
+    slug: "master-controller",
+    tagline: "Archived legacy project",
+    description: "This is a legacy portfolio entry retained for historical context. Earlier copy described infrastructure-monitoring functionality, version numbers, and downloadable installers, but those claims have not been re-verified. The repository is linked as the source of truth; no installers or release metrics are promoted here.",
+    status: "archived",
+    roadmapStage: "Archived",
+    version: "Historical",
+    platform: "Repository",
+    platformIcon: "archive",
+    progress: 100,
+    lastUpdated: "2026-06-25",
+    colorTheme: "linear-gradient(135deg, #334155 0%, #475569 100%)",
+    accentColor: "#94A3B8",
+    githubUrl: "https://github.com/Chinmay20-09/master-controller",
+    bugReportUrl: "https://github.com/Chinmay20-09/master-controller/issues",
+    featureRequestUrl: "https://github.com/Chinmay20-09/master-controller/issues",
+    currentlyShipping: false,
+    problem: "Previous portfolio copy presented release details as current without a recent verification pass.",
+    solution: "The entry is explicitly archived and removed from the default catalogue while preserving a link to the source history.",
+    expectedFeatures: ["Consult repository history for historical implementation details"],
+    techStack: [{ category: "Project Record", name: "Legacy", badge: "Archived" }],
+    knownIssues: [],
+    changelog: [],
+    faq: [],
+    gallery: []
   }
 ];
