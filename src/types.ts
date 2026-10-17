@@ -14,6 +14,7 @@ export interface ChangelogItem {
   commitSha?: string;
   commitUrl?: string;
   type?: string;
+  summary?: string;
 }
 
 export interface FAQItem {
