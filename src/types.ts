@@ -11,6 +11,9 @@ export interface ChangelogItem {
   improved?: string[];
   fixed?: string[];
   changes?: string[];
+  commitSha?: string;
+  commitUrl?: string;
+  type?: string;
 }
 
 export interface FAQItem {

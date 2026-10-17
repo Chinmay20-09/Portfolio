@@ -113,6 +113,7 @@ export function getStatusLabel(status: string): string {
 export function formatActivityDate(dateString: string): string {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
   const d = new Date(dateString);
+  if (!dateString || Number.isNaN(d.getTime())) return 'Date unavailable';
   return d.toLocaleDateString('en-US', options);
 }
 

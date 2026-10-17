@@ -1,113 +1,74 @@
 import { projects } from '../data/projects';
 import { DOM, formatActivityDate } from '../utils/dom';
+import { buildGlobalActivityEvents, getChangeTypeStyle } from '../data/changelog-builder';
 
 declare const lucide: any;
 
-interface ActivityEvent {
-  projectId: string;
-  projectName: string;
-  accentColor?: string;
-  version: string;
-  date: string;
-  changes: string[];
-  eventType: 'feature' | 'hotfix' | 'release' | string;
+function truncateSummary(text: string, limit = 160): string {
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= limit) return cleaned;
+  return `${cleaned.slice(0, limit).trim()}…`;
 }
 
 export function renderGlobalActivityFeed() {
   if (!DOM.activityTimeline) return;
-  DOM.activityTimeline.innerHTML = "";
+  DOM.activityTimeline.innerHTML = '';
 
-  const events: ActivityEvent[] = [];
-  
-  projects.forEach(proj => {
-    if (proj.changelog && proj.changelog.length > 0) {
-      proj.changelog.forEach(change => {
-        // Classify activity event type based on version
-        let eventType = "feature";
-        if (change.version.includes("rc") || change.version.includes("alpha") || change.version.includes("beta")) {
-          eventType = "hotfix";
-        } else if (parseFloat(change.version.replace(/[^\d.]/g, '')) >= 1.0) {
-          eventType = "release";
-        }
+  const events = buildGlobalActivityEvents(projects);
 
-        // Construct changes dynamically from added, improved, and fixed if they exist
-        const mergedChanges: string[] = [];
-        if (change.added && change.added.length > 0) {
-          change.added.forEach(item => mergedChanges.push(`Added: ${item}`));
-        }
-        if (change.improved && change.improved.length > 0) {
-          change.improved.forEach(item => mergedChanges.push(`Improved: ${item}`));
-        }
-        if (change.fixed && change.fixed.length > 0) {
-          change.fixed.forEach(item => mergedChanges.push(`Fixed: ${item}`));
-        }
-        // Fallback if they are not defined or are empty
-        if (mergedChanges.length === 0) {
-          if (change.changes && Array.isArray(change.changes)) {
-            mergedChanges.push(...change.changes);
-          } else {
-            mergedChanges.push("Maintenance and stability updates.");
-          }
-        }
-
-        events.push({
-          projectId: proj.id,
-          projectName: proj.name,
-          accentColor: proj.accentColor,
-          version: change.version,
-          date: change.date,
-          changes: mergedChanges,
-          eventType: eventType
-        });
-      });
+  if (events.length === 0) {
+    DOM.activityTimeline.innerHTML = `
+      <div class="activity-empty-state">
+        <div class="activity-empty-icon"><i data-lucide="git-commit"></i></div>
+        <h3>No recorded changelog events</h3>
+        <p>Activity is built only from commits documented in the project changelog source. Nothing is fabricated when history is unavailable.</p>
+      </div>
+    `;
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
     }
-  });
-
-  // Sort activity feed by date desc
-  events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return;
+  }
 
   events.forEach(ev => {
-    const eventEl = document.createElement("div");
-    eventEl.className = "activity-event";
-    eventEl.id = `activity-event-${ev.projectId}-${ev.version}`;
-    
-    let nodeClass = "node-feature";
-    let badgeClass = "badge-feature";
-    let badgeText = "Update Node";
-    
-    if (ev.eventType === "release") {
-      nodeClass = "node-release";
-      badgeClass = "badge-release";
-      badgeText = "Production Release";
-    } else if (ev.eventType === "hotfix") {
-      nodeClass = "node-hotfix";
-      badgeClass = "badge-hotfix";
-      badgeText = "Testing Build";
-    }
+    const eventEl = document.createElement('div');
+    eventEl.className = 'activity-event';
+    // eventKey is a commit SHA where available, so DOM ids stay unique.
+    eventEl.id = `activity-event-${ev.projectId}-${ev.eventKey}`;
+
+    const style = getChangeTypeStyle(ev.changeType);
 
     eventEl.innerHTML = `
-      <div class="activity-node ${nodeClass}"></div>
+      <div class="activity-node ${style.nodeClass}"></div>
       <div class="activity-header">
         <span class="activity-date">${formatActivityDate(ev.date)}</span>
-        <span class="activity-badge ${badgeClass}">${badgeText}</span>
-        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">
-          COMPILER // ${ev.projectId.toUpperCase()}
-        </span>
+        <span class="activity-badge ${style.badgeClass}">${style.badgeText}</span>
+        <span class="activity-project-tag">${ev.projectName}</span>
       </div>
       <div class="activity-card">
-        <h3 class="activity-title">${ev.projectName} <span>${ev.version}</span></h3>
-        <div class="activity-body">
+        <h3 class="activity-title">
+          <a href="#/project/${ev.projectId}">${ev.projectName}</a>
+        </h3>
+        <p class="activity-summary">${truncateSummary(ev.summary)}</p>
+        ${ev.details.length > 1 ? `
           <ul class="activity-changes-list">
-            ${ev.changes.map(ch => `<li>${ch}</li>`).join('')}
+            ${ev.details.map(d => `<li>${truncateSummary(d, 220)}</li>`).join('')}
           </ul>
-        </div>
+        ` : ''}
         <div class="activity-footer">
-          <a href="#" class="activity-footer-link" onclick="openProjectDetailsModal('${ev.projectId}'); return false;">
-            <i data-lucide="info" style="width:14px; height:14px;"></i> Details
-          </a>
-          <a href="#" class="activity-footer-link" onclick="copyProjectLinkToClipboard('${ev.projectId}'); return false;">
-            <i data-lucide="copy" style="width:14px; height:14px;"></i> Share
-          </a>
+          <div class="activity-meta">
+            ${ev.commitSha ? `<span class="activity-sha" title="Short commit SHA">${ev.commitSha.slice(0, 7)}</span>` : '<span class="activity-sha">commit unavailable</span>'}
+          </div>
+          <div class="activity-actions">
+            ${ev.commitUrl ? `
+              <a class="activity-footer-link" href="${ev.commitUrl}" target="_blank" rel="noopener noreferrer">
+                <i data-lucide="git-commit" style="width:14px; height:14px;"></i> View Commit
+              </a>
+            ` : ''}
+            <a class="activity-footer-link" href="#/project/${ev.projectId}">
+              <i data-lucide="info" style="width:14px; height:14px;"></i> Details
+            </a>
+          </div>
         </div>
       </div>
     `;

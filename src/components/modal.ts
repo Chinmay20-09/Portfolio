@@ -1,5 +1,6 @@
 import { projects } from '../data/projects';
 import { DOM, state, getStatusBadgeClass, getStatusLabel, showToastNotification, formatActivityDate } from '../utils/dom';
+import { getChangeTypeStyle } from '../data/changelog-builder';
 
 declare const lucide: any;
 
@@ -121,13 +122,20 @@ export function openProjectDetailsModal(projectId: string) {
     });
   }
 
-  // Render Changelogs Tab
+  // Render Changelogs Tab (commit-derived events, not release notes)
   if (DOM.modalChangelogContainer) {
     DOM.modalChangelogContainer.innerHTML = "";
+
+    if (!proj.changelog || proj.changelog.length === 0) {
+      const empty = document.createElement("p");
+      empty.style.cssText = "color: var(--text-muted); font-size: 0.8125rem; font-style: italic;";
+      empty.textContent = "No recorded changelog events for this project.";
+      DOM.modalChangelogContainer.appendChild(empty);
+    } else {
     proj.changelog.forEach(history => {
       const block = document.createElement("div");
       block.className = "changelog-release-block";
-      
+
       const changesArr = history.changes || [];
       const addedArr = history.added || [];
       const improvedArr = history.improved || [];
@@ -145,16 +153,30 @@ export function openProjectDetailsModal(projectId: string) {
         }
       }
 
+      const style = getChangeTypeStyle(history.type);
+      const sha = history.commitSha ? history.commitSha.slice(0, 7) : "";
+
       block.innerHTML = `
-        <div class="changelog-release-title">${history.version} <span>Released on ${history.date}</span></div>
+        <div class="changelog-release-title">
+          ${history.type === 'release' ? history.version : 'Development update'}
+          <span>${formatActivityDate(history.date)}</span>
+          <span class="activity-badge ${style.badgeClass}">${style.badgeText}</span>
+          ${sha ? `<span class="activity-sha">${sha}</span>` : ''}
+        </div>
         <div class="changelog-release-desc">
           <ul style="list-style: disc; margin-left: 20px; padding: 4px 0;">
             ${mergedList.map(c => `<li style="margin-bottom:4px;">${c}</li>`).join('')}
           </ul>
+          ${history.commitUrl ? `
+            <a class="activity-footer-link" href="${history.commitUrl}" target="_blank" rel="noopener noreferrer" style="margin-top: 8px; display: inline-flex;">
+              <i data-lucide="git-commit" style="width:14px; height:14px;"></i> View Commit
+            </a>
+          ` : ''}
         </div>
       `;
       DOM.modalChangelogContainer.appendChild(block);
     });
+    }
   }
 
   // Bug tracking configure

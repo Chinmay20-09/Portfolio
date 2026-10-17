@@ -1,17 +1,85 @@
 import { projects } from '../data/projects';
 import { DOM, state, getStatusBadgeClass, getStatusLabel, showToastNotification } from '../utils/dom';
+import { buildGlobalActivityEvents, getChangeTypeStyle } from '../data/changelog-builder';
+import { formatActivityDate } from '../utils/dom';
 
 declare const lucide: any;
 
+function projectChangelogHTML(project: typeof projects[0]): string {
+  const events = buildGlobalActivityEvents([project]);
+  if (events.length === 0) {
+    return `
+      <div class="pt-8 border-t border-[rgba(255,255,255,0.06)] space-y-6">
+        <div class="space-y-1">
+          <h3 class="text-xl font-sans font-semibold text-white flex items-center gap-2">
+            <i data-lucide="git-commit" class="w-5 h-5 text-blue-500"></i>
+            <span>GitHub-Style Version Timeline</span>
+          </h3>
+          <p class="text-xs text-[rgba(255,255,255,0.4)] font-mono">Commit-derived development events. Release badges appear only for verified releases.</p>
+        </div>
+        <div class="relative pl-1">
+          <div class="activity-empty-state">
+            <h3>No recorded changelog events</h3>
+            <p>No verified commit history is available for this entry, so no activity is shown.</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="pt-8 border-t border-[rgba(255,255,255,0.06)] space-y-6">
+      <div class="space-y-1">
+        <h3 class="text-xl font-sans font-semibold text-white flex items-center gap-2">
+          <i data-lucide="git-commit" class="w-5 h-5 text-blue-500"></i>
+          <span>GitHub-Style Version Timeline</span>
+        </h3>
+        <p class="text-xs text-[rgba(255,255,255,0.4)] font-mono">Commit-derived development events. Release badges appear only for verified releases.</p>
+      </div>
+      <div class="relative pl-1">
+        ${events.map(ev => {
+          const type = getChangeTypeStyle(ev.changeType);
+          return `
+            <div class="activity-event" id="activity-event-${ev.projectId}-${ev.eventKey}">
+              <div class="activity-node ${type.nodeClass}"></div>
+              <div class="activity-header">
+                <span class="activity-date">${formatActivityDate(ev.date)}</span>
+                <span class="activity-badge ${type.badgeClass}">${type.badgeText}</span>
+                <span class="activity-project-tag">${ev.projectName}</span>
+              </div>
+              <div class="activity-card">
+                <h3 class="activity-title">${ev.projectName}</h3>
+                <p class="activity-summary">${ev.summary}</p>
+                <div class="activity-body">
+                  ${ev.details.map(d => `<p>${d}</p>`).join('')}
+                </div>
+                <div class="activity-footer">
+                  <div class="activity-meta">
+                    ${ev.commitSha ? `<span class="activity-sha" title="Short commit SHA">${ev.commitSha.slice(0, 7)}</span>` : '<span class="activity-sha">commit unavailable</span>'}
+                  </div>
+                  <div class="activity-actions">
+                    ${(ev.commitUrl) ? `<a class="activity-footer-link" href="${ev.commitUrl}" target="_blank" rel="noopener noreferrer" title="View commit on GitHub"><i data-lucide="git-commit" style="width:14px; height:14px;"></i> View Commit</a>` : ''}
+                    <a class="activity-footer-link" href="#/project/${ev.projectId}" title="Open project details"><i data-lucide="info" style="width:14px; height:14px;"></i> Details</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
 export function renderProjectCatalog() {
   if (!DOM.projectsWrapper) return;
-  
+
   // Clear layout wrapper
   DOM.projectsWrapper.innerHTML = "";
-  
+
   // Apply Search & Filter rules
   const filtered = projects.filter(proj => {
-    
+
     // Keep archived projects out of the normal catalogue; show them only on Archived.
     if (state.activeFilter === "archived") {
       if (proj.status !== "archived" && proj.roadmapStage !== "Archived") return false;
@@ -21,7 +89,7 @@ export function renderProjectCatalog() {
       if (state.activeFilter === "released" && proj.roadmapStage !== "Released") return false;
     }
 
-    
+
     // Search query checking
     if (state.searchQuery) {
       const q = state.searchQuery.toLowerCase();
@@ -33,7 +101,7 @@ export function renderProjectCatalog() {
       const matchPlatform = proj.platform.toLowerCase().includes(q);
       return matchName || matchTagline || matchDesc || matchTech || matchFeat || matchPlatform;
     }
-    
+
     return true;
   });
 
@@ -76,11 +144,11 @@ export function renderProjectCatalog() {
     const card = document.createElement("div");
     card.className = "project-card";
     card.id = `project-card-${proj.id}`;
-    
+
     // Status Badge Markup
     const badgeClass = getStatusBadgeClass(proj.status);
     const badgeLabel = getStatusLabel(proj.status);
-    
+
     // Generate fallback geometric visual cover based on the gradient colorTheme
     const coverMarkup = state.viewMode === "grid" ? `
       <div class="card-hero-image" style="background: ${proj.colorTheme || 'var(--accent-gradient)'};">
@@ -142,7 +210,7 @@ export function renderProjectCatalog() {
         downloadUrl = downloads.windows || downloads.android || downloads.linux || downloads.mac || downloads.cli || "";
       }
       const hasDownload = downloadUrl !== "";
-      
+
       actionButtonsMarkup = `
         <div class="card-actions-released flex flex-col gap-2 w-full pt-4">
           <a href="${downloadUrl}" target="_blank" class="w-full py-2.5 px-4 rounded-lg font-sans font-semibold text-xs text-center text-white flex items-center justify-center gap-2 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-[1.02] shadow-md shadow-blue-500/10" ${hasDownload ? '' : 'style="pointer-events: none; opacity: 0.4;"'}>
@@ -227,7 +295,7 @@ export function renderProjectCatalog() {
 
 export function filterProjects(filterType: string) {
   state.activeFilter = filterType;
-  
+
   // Update button classes
   if (DOM.filterStatusGroup) {
     const btns = DOM.filterStatusGroup.querySelectorAll(".filter-btn");
@@ -239,7 +307,7 @@ export function filterProjects(filterType: string) {
       }
     });
   }
-  
+
   renderProjectCatalog();
 }
 
@@ -248,7 +316,7 @@ export function resetSearchEngine() {
   if (DOM.clearSearch) DOM.clearSearch.style.display = "none";
   state.searchQuery = "";
   state.activeFilter = "all";
-  
+
   if (DOM.filterStatusGroup) {
     const btns = DOM.filterStatusGroup.querySelectorAll(".filter-btn");
     btns.forEach(b => {
@@ -259,7 +327,7 @@ export function resetSearchEngine() {
       }
     });
   }
-  
+
   renderProjectCatalog();
 }
 
@@ -284,25 +352,25 @@ export function copyCoreLink() {
 export function renderCurrentlyShipping() {
   const container = DOM.currentlyShippingWrapper;
   if (!container) return;
-  
+
   const shipProject = projects.find(p => p.currentlyShipping === true);
   if (!shipProject) {
     container.innerHTML = "";
     return;
   }
-  
+
   const hasAssets = shipProject.downloadAssets && (
-    shipProject.downloadAssets.windows || 
-    shipProject.downloadAssets.linux || 
-    shipProject.downloadAssets.mac || 
-    shipProject.downloadAssets.android || 
+    shipProject.downloadAssets.windows ||
+    shipProject.downloadAssets.linux ||
+    shipProject.downloadAssets.mac ||
+    shipProject.downloadAssets.android ||
     shipProject.downloadAssets.cli
   );
 
   container.innerHTML = `
     <div class="currently-shipping-card p-8 rounded-2xl relative overflow-hidden flex flex-col md:flex-row gap-8 items-center border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)]">
       <div class="absolute -right-24 -bottom-24 w-80 h-80 bg-blue-500/10 blur-[100px] pointer-events-none rounded-full"></div>
-      
+
       <div class="flex-1 space-y-4">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase">
           <span class="relative flex h-2 w-2">
@@ -311,16 +379,16 @@ export function renderCurrentlyShipping() {
           </span>
           Currently Shipping
         </div>
-        
+
         <div class="space-y-1">
           <h3 class="text-2xl font-sans font-semibold tracking-tight text-white">${shipProject.name}</h3>
           <p class="text-sm font-mono text-[rgba(255,255,255,0.4)] uppercase tracking-wider">Next Release Expected: ${shipProject.expectedNextRelease || 'Upcoming'}</p>
         </div>
-        
+
         <p class="text-[rgba(255,255,255,0.7)] text-sm leading-relaxed max-w-xl">
           ${shipProject.description}
         </p>
-        
+
         <div class="flex flex-wrap gap-2 pt-2">
           ${shipProject.techStack.map(tech => `
             <span class="px-2 py-0.5 rounded text-[11px] font-mono tracking-wider border bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.6)]">
@@ -329,13 +397,13 @@ export function renderCurrentlyShipping() {
           `).join('')}
         </div>
       </div>
-      
+
       <div class="w-full md:w-auto shrink-0 flex flex-col gap-3 min-w-[200px]">
-        <a href="#/project/${shipProject.id}" class="w-full py-3 px-6 rounded-lg font-sans font-medium text-sm text-center text-white flex items-center justify-center gap-2 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-[1.02] shadow-lg shadow-blue-500/20">
+        <a href="#/project/${shipProject.id}" class="w-full py-3 px-6 rounded-lg font-sans font-medium text-sm text-center text-white flex items-center justify-center gap-2 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-600 hover:scale-[1.02] shadow-lg shadow-blue-500/20">
           <span>Explore Product</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
-        
+
         ${hasAssets ? `
           <a href="#/project/${shipProject.id}" class="w-full py-2.5 px-6 rounded-lg font-sans font-medium text-xs text-center text-[rgba(255,255,255,0.7)] flex items-center justify-center gap-2 transition-all border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.06)] hover:text-white">
             <i data-lucide="download" class="w-3.5 h-3.5"></i>
@@ -353,26 +421,26 @@ export function renderCurrentlyShipping() {
 export function renderProjectPage(projectId: string) {
   const container = DOM.projectRoot;
   if (!container) return;
-  
+
   const project = projects.find(p => p.id === projectId);
   if (!project) {
     container.innerHTML = `<div class="p-8 text-center text-[rgba(255,255,255,0.5)] font-mono">Product not found. <a href="#/" class="text-blue-400 hover:underline">Return home</a>.</div>`;
     return;
   }
-  
+
   document.title = `${project.name} // Software Distribution`;
-  
+
   // Choose fallback style based on color theme or a placeholder gradient
   const themeBg = project.colorTheme || "linear-gradient(135deg, #1f2937 0%, #111827 100%)";
-  
+
   // Render Download Assets details
   const hasAssets = project.downloadAssets && (project.downloadAssets.windows || project.downloadAssets.mac || project.downloadAssets.linux || project.downloadAssets.android || project.downloadAssets.cli);
-  
+
   // Build Download items list
   let downloadItemsHTML = "";
   if (project.downloadAssets) {
     const assets = project.downloadAssets;
-    
+
     // Windows Build
     if (assets.windows) {
       downloadItemsHTML += `
@@ -386,7 +454,7 @@ export function renderProjectPage(projectId: string) {
               <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Installer (.exe) // Production Ready</p>
             </div>
           </div>
-          <a href="${assets.windows}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
+          <a href="${assets.windows}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-600 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
           </a>
         </div>
@@ -497,7 +565,7 @@ export function renderProjectPage(projectId: string) {
               <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Direct Package Installer (.apk)</p>
             </div>
           </div>
-          <a href="${assets.android}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
+          <a href="${assets.android}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-600 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
           </a>
         </div>
@@ -546,7 +614,7 @@ export function renderProjectPage(projectId: string) {
       `;
     }
   }
-  
+
   // Find primary build action link to feature at the very top of download board
   let primaryCtaHTML = "";
   if (project.downloadAssets) {
@@ -568,7 +636,7 @@ export function renderProjectPage(projectId: string) {
       primaryUrl = "#copy-cli";
       primaryLabel = "Install CLI Package";
     }
-    
+
     if (primaryUrl) {
       if (primaryUrl === "#copy-cli") {
         primaryCtaHTML = `
@@ -627,82 +695,24 @@ export function renderProjectPage(projectId: string) {
   }
 
   // Version Timeline HTML
-  let changelogHTML = "";
-  if (project.changelog && project.changelog.length > 0) {
-    changelogHTML = project.changelog.map(log => {
-      let notesHTML = "";
-      if (log.added && log.added.length > 0) {
-        notesHTML += `
-          <div>
-            <h6 class="text-[11px] font-mono text-emerald-400 uppercase tracking-widest pb-1 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Added
-            </h6>
-            <ul class="list-disc list-inside text-xs text-[rgba(255,255,255,0.7)] space-y-1 pl-1">
-              ${log.added.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-      }
-      if (log.improved && log.improved.length > 0) {
-        notesHTML += `
-          <div class="mt-3">
-            <h6 class="text-[11px] font-mono text-blue-400 uppercase tracking-widest pb-1 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Improved
-            </h6>
-            <ul class="list-disc list-inside text-xs text-[rgba(255,255,255,0.7)] space-y-1 pl-1">
-              ${log.improved.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-      }
-      if (log.fixed && log.fixed.length > 0) {
-        notesHTML += `
-          <div class="mt-3">
-            <h6 class="text-[11px] font-mono text-rose-400 uppercase tracking-widest pb-1 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Fixed
-            </h6>
-            <ul class="list-disc list-inside text-xs text-[rgba(255,255,255,0.7)] space-y-1 pl-1">
-              ${log.fixed.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-      }
+  const changelogHTML = projectChangelogHTML(project);
 
-      const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-      const formattedDate = new Date(log.date).toLocaleDateString('en-US', options);
-
-      return `
-        <div class="relative pl-8 border-l border-[rgba(255,255,255,0.08)] pb-8 last:pb-2">
-          <div class="absolute -left-[6px] top-1.5 w-3 h-3 rounded-full bg-[#0d0e12] border-2 border-blue-500"></div>
-          
-          <div class="flex flex-wrap items-baseline gap-2 pb-2">
-            <span class="text-sm font-sans font-semibold text-white">${log.version}</span>
-            <span class="text-[11px] font-mono text-[rgba(255,255,255,0.4)]">${formattedDate}</span>
-          </div>
-          
-          <div class="space-y-3 bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.03)] p-4 rounded-xl">
-            ${notesHTML || '<p class="text-xs text-[rgba(255,255,255,0.4)] italic">Maintenance build with minor system improvements</p>'}
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // Compile Signature Live logs block
+  // Static snapshot of the recorded changelog. This is explicitly not live telemetry.
+  const latestEvent = buildGlobalActivityEvents([project])[0];
   const recentUpdatesFeedHTML = `
-    <div class="p-4 rounded-xl bg-black border border-[rgba(255,255,255,0.06)] font-mono text-xs text-[rgba(255,255,255,0.7)] space-y-2 max-h-[300px] overflow-y-auto select-all">
-      <div class="flex items-center justify-between text-[rgba(255,255,255,0.4)] border-b border-[rgba(255,255,255,0.08)] pb-1.5 mb-2">
-        <span>TRANSMISSION_ID: TX-${project.id.toUpperCase()}-SYSTEM</span>
+    <div class="p-4 rounded-xl bg-black border border-[rgba(255,255,255,0.06)] font-mono text-xs text-[rgba(255,255,255,0.7)] space-y-1.5">
+      <div class="flex items-center justify-between text-[rgba(255,255,255,0.4)] border-b border-[rgba(255,255,255,0.08)] pb-1.5 mb-2 gap-2">
+        <span>REPOSITORY SNAPSHOT // NOT LIVE</span>
         <span>${project.lastUpdated}</span>
       </div>
-      <p class="text-blue-400">&gt; initialising core system handshake with github repository...</p>
-      <p class="text-emerald-400">✓ connection established securely // secure_rsa_ssl_sha256</p>
-      <p>&gt; fetching latest commit pointers from branch: "main"</p>
-      <p class="text-[rgba(255,255,255,0.5)] pl-2">commit_hash: 5ef3a1b3df6672a90098fbc18d2290f01a ${project.lastUpdated}</p>
-      <p class="text-[rgba(255,255,255,0.5)] pl-2">author: Chinmay Kolte &lt;chinmaykolte.work@gmail.com&gt;</p>
-      <p class="text-emerald-400">&gt; pipeline build status: SUCCESSFUL // production build ready</p>
-      <p class="text-orange-400 pl-2">warnings: 0 // errors: 0 // modules compiled: 42</p>
-      <p class="text-emerald-500 animate-pulse">&gt; waiting for localized download signals (sys_awake)...</p>
+      <p class="text-[rgba(255,255,255,0.5)]">&gt; source: PROJECT_CHANGELOG_SOURCE.md (retrieved 2026-10-17)</p>
+      ${latestEvent ? `
+        <p>&gt; latest documented commit: <span class="text-[rgba(255,255,255,0.5)]">${latestEvent.commitSha ? latestEvent.commitSha.slice(0, 7) : 'unavailable'}</span> ${latestEvent.date}</p>
+        <p class="text-[rgba(255,255,255,0.5)] pl-2">${latestEvent.summary}</p>
+      ` : `
+        <p class="text-[rgba(255,255,255,0.5)]">&gt; no verified commit history recorded for this entry</p>
+      `}
+      <p class="text-[rgba(255,255,255,0.4)]">&gt; static portfolio data; no build, test, or deployment status is implied.</p>
     </div>
   `;
 
@@ -716,7 +726,7 @@ export function renderProjectPage(projectId: string) {
           ${project.gallery.map(item => `
             <div class="relative rounded-xl overflow-hidden border border-[rgba(255,255,255,0.06)] aspect-video bg-[rgba(255,255,255,0.02)] group flex flex-col justify-end p-4">
               <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px] bg-center group-hover:scale-105 transition-transform duration-300 pointer-events-none"></div>
-              
+
               <div class="absolute inset-0 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity">
                 <div class="w-2/3 h-1/2 rounded-lg border border-dashed border-[rgba(255,255,255,0.15)] flex flex-col items-center justify-center gap-1 p-2 bg-black/40">
                   <i data-lucide="layers" class="w-5 h-5 text-blue-400"></i>
@@ -724,7 +734,7 @@ export function renderProjectPage(projectId: string) {
                   <span class="text-[10px] font-sans font-medium text-white">${item.title}</span>
                 </div>
               </div>
-              
+
               <div class="relative bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded border border-[rgba(255,255,255,0.05)] flex items-center justify-between">
                 <span class="text-xs font-sans font-medium text-[rgba(255,255,255,0.8)]">${item.title}</span>
                 <span class="text-[9px] font-mono text-blue-400 uppercase tracking-wider">Operational Diagram</span>
@@ -748,7 +758,7 @@ export function renderProjectPage(projectId: string) {
           <span class="text-[10px] font-mono text-[rgba(255,255,255,0.5)] uppercase tracking-wider">Viewing Release Distribution node</span>
         </div>
       </div>
-      
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2 space-y-8">
           <div class="space-y-4">
@@ -758,7 +768,7 @@ export function renderProjectPage(projectId: string) {
                 ${getStatusLabel(project.status)}
               </span>
             </div>
-            
+
             <p class="text-lg text-[rgba(255,255,255,0.8)] font-sans font-light tracking-wide max-w-2xl leading-relaxed">
               ${project.tagline}
             </p>
@@ -864,11 +874,11 @@ export function renderProjectPage(projectId: string) {
           ` : ''}
 
         </div>
-        
+
         <div class="space-y-6">
           <div class="p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.03] to-[rgba(0,0,0,0)] space-y-6 relative overflow-hidden">
             <div class="absolute -top-12 -left-12 w-48 h-48 bg-blue-500/10 blur-[60px] pointer-events-none rounded-full"></div>
-            
+
             <div class="space-y-2 relative">
               <span class="text-[10px] font-mono text-blue-400 uppercase tracking-widest flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Target Distribution Node
@@ -876,11 +886,11 @@ export function renderProjectPage(projectId: string) {
               <h3 class="text-xl font-sans font-semibold text-white">Download Center</h3>
               <p class="text-xs text-[rgba(255,255,255,0.5)]">Fetch compiled OS release builds for testing and execution.</p>
             </div>
-            
+
             <div class="space-y-2">
               ${primaryCtaHTML}
             </div>
-            
+
             <div class="space-y-3 pt-2">
               <h4 class="text-xs font-mono uppercase text-[rgba(255,255,255,0.4)] tracking-widest">Available Architectures</h4>
               <div class="space-y-2">
@@ -893,7 +903,7 @@ export function renderProjectPage(projectId: string) {
             <h4 class="text-xs font-mono uppercase text-[rgba(255,255,255,0.4)] tracking-widest flex items-center gap-1.5">
               <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Repository Telemetry
             </h4>
-            
+
             <div class="flex flex-col gap-2">
               <a href="${project.githubUrl}" target="_blank" class="w-full py-2.5 px-4 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] text-xs text-white font-sans font-medium flex items-center justify-between transition-all">
                 <span class="flex items-center gap-2">
@@ -924,7 +934,7 @@ export function renderProjectPage(projectId: string) {
 
           <div class="space-y-2">
             <h4 class="text-xs font-mono uppercase text-[rgba(255,255,255,0.4)] tracking-widest flex items-center gap-1.5">
-              <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Live Build Telemetry
+              <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Repository Snapshot (static)
             </h4>
             ${recentUpdatesFeedHTML}
           </div>
@@ -933,21 +943,7 @@ export function renderProjectPage(projectId: string) {
 
       </div>
 
-      ${changelogHTML ? `
-        <div class="pt-8 border-t border-[rgba(255,255,255,0.06)] space-y-6">
-          <div class="space-y-1">
-            <h3 class="text-xl font-sans font-semibold text-white flex items-center gap-2">
-              <i data-lucide="git-commit" class="w-5 h-5 text-blue-500"></i>
-              <span>GitHub-Style Version Timeline</span>
-            </h3>
-            <p class="text-xs text-[rgba(255,255,255,0.4)] font-mono">Detailed release logs and build tags synchronized directly with deployment commits.</p>
-          </div>
-          
-          <div class="relative pl-1">
-            ${changelogHTML}
-          </div>
-        </div>
-      ` : ''}
+      ${changelogHTML}
 
     </div>
   `;

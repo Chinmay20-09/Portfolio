@@ -94,6 +94,8 @@ function initScrollAnimations() {
 /* ==========================================================================
    DISTRIBUTION HUB ROUTER
    ========================================================================== */
+let currentView: "home" | "project" = "home";
+
 export function handleRouting() {
   const hash = window.location.hash || "";
   
@@ -105,16 +107,25 @@ export function handleRouting() {
       return;
     }
   }
-  
-  showHomepage();
+
+  // Plain in-page anchors (#projects, #contact, ...) are scrolled by the
+  // browser. Only rebuild the homepage when returning from a project page,
+  // otherwise every nav click would jump back to the top.
+  if (currentView !== "home") {
+    const targetId = hash.startsWith("#/") ? "" : hash.slice(1);
+    const anchor = targetId ? document.getElementById(targetId) : null;
+    showHomepage({ scrollToTop: !anchor });
+    if (anchor) anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
-function showHomepage() {
+function showHomepage({ scrollToTop = true }: { scrollToTop?: boolean } = {}) {
   if (DOM.projectRoot) DOM.projectRoot.classList.add("hidden");
   if (DOM.homepageRoot) DOM.homepageRoot.classList.remove("hidden");
   document.title = "Chinmay Kolte // CORE Software Hub";
   renderCurrentlyShipping();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  currentView = "home";
+  if (scrollToTop) window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function showProjectPage(projectId: string) {
@@ -123,6 +134,7 @@ function showProjectPage(projectId: string) {
     DOM.projectRoot.classList.remove("hidden");
     renderProjectPage(projectId);
   }
+  currentView = "project";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -363,6 +375,7 @@ function initApp() {
   renderProjectCatalog();
   renderRoadmapBoard();
   renderGlobalActivityFeed();
+  renderCurrentlyShipping();
   initCommandPaletteDynamicList();
   
   // Set Up Event Handlers
