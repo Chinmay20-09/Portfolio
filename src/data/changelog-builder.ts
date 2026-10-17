@@ -904,25 +904,9 @@ export function buildGlobalActivityEvents(projectsData: Project[]): ChangelogEve
   for (const project of projectsData) {
     const entries = projectChangelogs[project.id];
     if (!entries || entries.length === 0) continue;
-    for (let i = 0; i < entries.length; i += 1) {
-      const entry = entries[i];
-      const key = `${project.id}:${entry.commitUrl || entry.commitSha || i}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      events.push(buildChangelogEvent(project, entry, i));
-    }
-  }
-
-  // Newest first. Unparseable dates sort last instead of producing NaN ordering.
-  events.sort((a, b) => {
-    const aTime = Date.parse(a.date);
-    const bTime = Date.parse(b.date);
-    if (Number.isNaN(aTime) && Number.isNaN(bTime)) return 0;
+    // Only show the most recent (first) commit per project in the global feed    const entry = entries[0];        const key = `${project.id}:${entry.commitUrl || entry.commitSha || 0}`;    if (seen.has(key)) continue;    seen.add(key);    events.push(buildChangelogEvent(project, entry, 0));  }  // Newest first. Unparseable dates sort last instead of producing NaN ordering.  events.sort((a, b) => {    const aTime = Date.parse(a.date);    const bTime = Date.parse(b.date);    if (Number.isNaN(aTime) && Number.isNaN(bTime)) return 0;
     if (Number.isNaN(aTime)) return 1;
     if (Number.isNaN(bTime)) return -1;
-    return bTime - aTime;
-  });
-
-  return events;
+    return bTime - aTime;  });
+  return events;
 }

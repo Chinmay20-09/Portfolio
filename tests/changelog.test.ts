@@ -101,8 +101,8 @@ describe('changelog source data', () => {
 describe('buildGlobalActivityEvents', () => {
   const events = buildGlobalActivityEvents(projects);
 
-  it('produces one event per sourced commit', () => {
-    expect(events).toHaveLength(79);
+  it('produces one event per project', () => {
+    expect(events).toHaveLength(7);
   });
 
   it('orders the feed newest-first', () => {
