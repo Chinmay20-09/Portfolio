@@ -1,4 +1,6 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base } from '@playwright/test';
+
+export { expect } from '@playwright/test';
 
 /**
  * The page pulls Lucide and Google Fonts from CDNs. Browser tests must not
@@ -33,5 +35,3 @@ export const test = base.extend({
     await use(page);
   },
 });
-
-export { expect };

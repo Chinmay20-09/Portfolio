@@ -1438,21 +1438,14 @@ button, input, select, textarea {
   justify-content: center;
 }
 
-.activity-node.node-feature { border-color: var(--accent-purple); }
-.activity-node.node-fix { border-color: var(--accent-orange); }
-.activity-node.node-refactor { border-color: var(--accent-blue); }
-.activity-node.node-documentation { border-color: var(--accent-green); }
-.activity-node.node-testing { border-color: var(--accent-orange); }
-.activity-node.node-release { border-color: var(--accent-green); }
-.activity-node.node-maintenance { border-color: var(--text-muted); }
-
-.activity-node.node-feature { background-color: var(--accent-purple); }
-.activity-node.node-fix { background-color: var(--accent-orange); }
-.activity-node.node-refactor { background-color: var(--accent-blue); }
-.activity-node.node-documentation { background-color: var(--accent-green); }
-.activity-node.node-testing { background-color: var(--accent-orange); }
-.activity-node.node-release { background-color: var(--accent-green); }
-.activity-node.node-maintenance { background-color: var(--text-muted); }
+/* border + fill per change type, kept in one block so each selector appears once */
+.activity-node.node-feature { border-color: var(--accent-purple); background-color: var(--accent-purple); }
+.activity-node.node-fix { border-color: var(--accent-orange); background-color: var(--accent-orange); }
+.activity-node.node-refactor { border-color: var(--accent-blue); background-color: var(--accent-blue); }
+.activity-node.node-documentation { border-color: var(--accent-green); background-color: var(--accent-green); }
+.activity-node.node-testing { border-color: var(--accent-orange); background-color: var(--accent-orange); }
+.activity-node.node-release { border-color: var(--accent-green); background-color: var(--accent-green); }
+.activity-node.node-maintenance { border-color: var(--text-muted); background-color: var(--text-muted); }
 
 .activity-event:hover .activity-node.node-feature { background-color: #a78bfa; box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2); }
 .activity-event:hover .activity-node.node-fix { background-color: #f59e0b; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2); }
@@ -2186,13 +2179,6 @@ button, input, select, textarea {
   margin-top: 8px;
 }
 
-/* Status Badge Variations */
-.status-stable { background-color: rgba(63, 185, 80, 0.12); color: var(--accent-green); }
-.status-beta { background-color: rgba(88, 166, 255, 0.12); color: var(--accent-blue); }
-.status-alpha { background-color: rgba(240, 136, 62, 0.12); color: var(--accent-orange); }
-.status-paused { background-color: rgba(255, 123, 114, 0.12); color: var(--accent-red); }
-.status-archived { background-color: rgba(139, 148, 158, 0.12); color: var(--text-muted); }
-
 /* Divider Line */
 .project-divider {
   width: 100%;
@@ -2204,12 +2190,6 @@ button, input, select, textarea {
 [data-theme="light"] .project-divider {
   background: rgba(0, 0, 0, 0.05);
 }
-
-/* Scrollbar improvements for project page */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
 /*** Light theme scrollbar ***/
 [data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); }
@@ -2447,7 +2427,6 @@ button, input, select, textarea {
   color: var(--text-muted);
   font-family: var(--font-mono);
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .channel-arrow {

@@ -15,7 +15,7 @@ export interface OverflowReport {
 }
 
 /** Measures real document overflow, ignoring intentionally off-canvas fixed UI. */
-export async function measureOverflow(page: Page): Promise<OverflowReport> {
+export function measureOverflow(page: Page): Promise<OverflowReport> {
   return page.evaluate(() => {
     const doc = document.documentElement;
     const viewport = doc.clientWidth;
@@ -42,7 +42,7 @@ export async function measureOverflow(page: Page): Promise<OverflowReport> {
       const rect = el.getBoundingClientRect();
       if (rect.right <= viewport + 0.5 && rect.left >= -0.5) continue;
       if (insideFixed(el) || insideClipper(el)) continue;
-      const className = typeof el.className === 'string' ? el.className.trim().split(/\s+/).join('.') : '';
+      const className = typeof el.className === 'string' ? el.className.trim().replaceAll(/\s+/g, '.') : '';
       offenders.push({
         selector: el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') + (className ? `.${className}` : ''),
         left: Math.round(rect.left),
@@ -51,11 +51,13 @@ export async function measureOverflow(page: Page): Promise<OverflowReport> {
       });
     }
 
+    offenders.sort((a, b) => b.right - a.right);
+
     return {
       clientWidth: viewport,
       scrollWidth: doc.scrollWidth,
       innerWidth: window.innerWidth,
-      offenders: offenders.sort((a, b) => b.right - a.right).slice(0, 10),
+      offenders: offenders.slice(0, 10),
     };
   });
 }

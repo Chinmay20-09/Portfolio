@@ -1,7 +1,6 @@
 import { projects } from '../data/projects';
-import { DOM, state, getStatusBadgeClass, getStatusLabel, showToastNotification } from '../utils/dom';
+import { DOM, state, getStatusBadgeClass, getStatusLabel, showToastNotification, formatActivityDate } from '../utils/dom';
 import { buildGlobalActivityEvents, getChangeTypeStyle } from '../data/changelog-builder';
-import { formatActivityDate } from '../utils/dom';
 
 declare const lucide: any;
 
@@ -699,6 +698,7 @@ export function renderProjectPage(projectId: string) {
 
   // Static snapshot of the recorded changelog. This is explicitly not live telemetry.
   const latestEvent = buildGlobalActivityEvents([project])[0];
+  const latestCommitSha = latestEvent?.commitSha ? latestEvent.commitSha.slice(0, 7) : 'unavailable';
   const recentUpdatesFeedHTML = `
     <div class="p-4 rounded-xl bg-black border border-[rgba(255,255,255,0.06)] font-mono text-xs text-[rgba(255,255,255,0.7)] space-y-1.5">
       <div class="flex items-center justify-between text-[rgba(255,255,255,0.4)] border-b border-[rgba(255,255,255,0.08)] pb-1.5 mb-2 gap-2">
@@ -707,7 +707,7 @@ export function renderProjectPage(projectId: string) {
       </div>
       <p class="text-[rgba(255,255,255,0.5)]">&gt; source: PROJECT_CHANGELOG_SOURCE.md (retrieved 2026-10-17)</p>
       ${latestEvent ? `
-        <p>&gt; latest documented commit: <span class="text-[rgba(255,255,255,0.5)]">${latestEvent.commitSha ? latestEvent.commitSha.slice(0, 7) : 'unavailable'}</span> ${latestEvent.date}</p>
+        <p>&gt; latest documented commit: <span class="text-[rgba(255,255,255,0.5)]">${latestCommitSha}</span> ${latestEvent.date}</p>
         <p class="text-[rgba(255,255,255,0.5)] pl-2">${latestEvent.summary}</p>
       ` : `
         <p class="text-[rgba(255,255,255,0.5)]">&gt; no verified commit history recorded for this entry</p>

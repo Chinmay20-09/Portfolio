@@ -29,7 +29,10 @@ describe('mobile horizontal overflow guards', () => {
   it('wraps long social handles instead of widening the card', () => {
     const handle = allDeclarations('.channel-handle');
     expect(handle).toContain('overflow-wrap: anywhere');
-    expect(handle).toContain('word-break: break-word');
+    // `word-break: break-word` is deprecated and adds nothing here: it is specified to
+    // behave like `word-break: normal` + `overflow-wrap: anywhere`, which is set above.
+    // Keeping it out is asserted so it cannot creep back in as a duplicate of that rule.
+    expect(handle).not.toContain('word-break: break-word');
   });
 
   it('does not leave overflow-wrap on the arrow decoration', () => {
