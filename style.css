@@ -4362,6 +4362,8 @@ button, input, select, textarea {
   --accent-blue-fill-hover: #1D4ED8;
   --accent-blue-text: #60A5FA;      /* accent as text on dark ground: 5.6:1 */
   --category-purple-text: #A78BFA;  /* changelog category text on dark: 5.4:1 */
+  --surface-sunken: rgba(240, 246, 252, 0.04);
+  --surface-sunken-strong: rgba(240, 246, 252, 0.09);
 }
 
 /* Light theme needs its own text/fill tonal steps: #60A5FA on white would fail. */
@@ -4370,6 +4372,8 @@ button, input, select, textarea {
   --accent-blue-fill-hover: #0A5CBF;
   --accent-blue-text: #0550AE;
   --category-purple-text: #6639BA;
+  --surface-sunken: rgba(208, 215, 222, 0.28);
+  --surface-sunken-strong: rgba(208, 215, 222, 0.5);
 }
 
 /* Interaction floor: every compact control shares one declaration block. */
@@ -4479,4 +4483,218 @@ button, input, select, textarea {
 /* Measure cap: uncapped prose rendered ~101-105 characters per line at 1440px. */
 p {
   max-width: 72ch;
+}
+
+/* Download board. Rows are generated from one spec table in catalog.ts, so the
+   layout lives here once instead of in five near-identical markup blocks. */
+.download-center {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--card-bg);
+}
+
+.download-center-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.detail-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--accent-blue-fill);
+}
+
+.detail-status-text {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.download-list-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.download-list-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.download-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.download-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-sunken);
+  transition: border-color var(--transition-fast);
+}
+
+.download-row:hover {
+  border-color: var(--card-border-hover);
+}
+
+.download-row-locked {
+  background-color: transparent;
+}
+
+.download-row-locked:hover {
+  border-color: var(--card-border);
+}
+
+.download-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.download-row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-sunken-strong);
+  color: var(--accent-blue-text);
+}
+
+.download-row-icon-muted {
+  color: var(--text-muted);
+}
+
+.download-row-icon-neutral {
+  color: var(--text-secondary);
+}
+
+.download-row-glyph {
+  width: 16px;
+  height: 16px;
+}
+
+.download-row-title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.download-row-locked .download-row-title {
+  color: var(--text-secondary);
+}
+
+.download-row-detail {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.download-row-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-sunken-strong);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  min-height: var(--target-min);
+}
+
+.download-row-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-sunken-strong);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: var(--target-min);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.download-row-copy:hover {
+  color: var(--text-primary);
+  border-color: var(--card-border-hover);
+}
+
+.cli-row {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.cli-command {
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-top: 0;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background-color: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  overflow-x: auto;
+  white-space: nowrap;
+  user-select: all;
+}
+
+.btn-download-primary,
+.btn-download-locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 14px 24px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.btn-download-locked {
+  background-color: var(--surface-sunken);
+  border-color: var(--card-border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.download-note {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
 }

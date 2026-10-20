@@ -385,21 +385,17 @@ export function renderProjectCatalog() {
   }
 }
 
+function syncFilterButtons(activeFilter: string) {
+  if (!DOM.filterStatusGroup) return;
+
+  DOM.filterStatusGroup.querySelectorAll(".filter-btn").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-filter") === activeFilter);
+  });
+}
+
 export function filterProjects(filterType: string) {
   state.activeFilter = filterType;
-
-  // Update button classes
-  if (DOM.filterStatusGroup) {
-    const btns = DOM.filterStatusGroup.querySelectorAll(".filter-btn");
-    btns.forEach(b => {
-      if (b.getAttribute("data-filter") === filterType) {
-        b.classList.add("active");
-      } else {
-        b.classList.remove("active");
-      }
-    });
-  }
-
+  syncFilterButtons(filterType);
   renderProjectCatalog();
 }
 
@@ -409,16 +405,7 @@ export function resetSearchEngine() {
   state.searchQuery = "";
   state.activeFilter = "all";
 
-  if (DOM.filterStatusGroup) {
-    const btns = DOM.filterStatusGroup.querySelectorAll(".filter-btn");
-    btns.forEach(b => {
-      if (b.getAttribute("data-filter") === "all") {
-        b.classList.add("active");
-      } else {
-        b.classList.remove("active");
-      }
-    });
-  }
+  syncFilterButtons("all");
 
   renderProjectCatalog();
 }
@@ -671,8 +658,8 @@ export function renderProjectPage(projectId: string) {
           <span>Back to Software Hub</span>
         </a>
         <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-          <span class="text-[10px] font-mono text-[rgba(255,255,255,0.5)] uppercase tracking-wider">Viewing Release Distribution node</span>
+          <span class="detail-status-dot"></span>
+          <span class="detail-status-text">Viewing Release Distribution node</span>
         </div>
       </div>
 
@@ -793,10 +780,11 @@ export function renderProjectPage(projectId: string) {
         </div>
 
         <div class="space-y-6">
+          ${hasAssets ? `
           <div class="download-center">
             <div class="space-y-2">
-              <p class="download-center-kicker">Target Distribution Node</p>
               <h3 class="text-xl font-sans font-semibold text-white">Download Center</h3>
+              <p class="download-center-kicker">Target Distribution Node</p>
               <p class="text-xs text-[rgba(255,255,255,0.5)]">Fetch compiled OS release builds for testing and execution.</p>
             </div>
 
@@ -811,6 +799,7 @@ export function renderProjectPage(projectId: string) {
               </div>
             </div>
           </div>
+          ` : ''}
 
           <div class="p-6 rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.01)] space-y-4">
             <h4 class="text-xs font-mono uppercase text-[rgba(255,255,255,0.4)] tracking-widest flex items-center gap-1.5">
