@@ -4,18 +4,117 @@ import { buildGlobalActivityEvents, getChangeTypeStyle } from '../data/changelog
 
 declare const lucide: any;
 
+function timelineHeaderHTML(): string {
+  return `
+    <div class="space-y-1">
+      <h3 class="text-xl font-sans font-semibold text-white flex items-center gap-2">
+        <i data-lucide="git-commit" class="w-5 h-5 text-blue-500"></i>
+        <span>GitHub-Style Version Timeline</span>
+      </h3>
+      <p class="text-xs text-[rgba(255,255,255,0.4)] font-mono">Commit-derived development events. Release badges appear only for verified releases.</p>
+    </div>
+  `;
+}
+
+type AssetKey = "windows" | "mac" | "linux" | "android";
+
+interface DownloadSpec {
+  key: AssetKey;
+  icon: string;
+  title: string;
+  lockedTitle: string;
+  detail: string;
+}
+
+const DOWNLOAD_SPECS: DownloadSpec[] = [
+  { key: "windows", icon: "monitor", title: "Windows Executable", lockedTitle: "Windows Installer", detail: "Installer (.exe) // Production Ready" },
+  { key: "mac", icon: "laptop", title: "macOS Build", lockedTitle: "macOS DMG", detail: "Disk Image (.dmg) // Apple Silicon & Intel" },
+  { key: "linux", icon: "terminal", title: "Linux Package", lockedTitle: "Linux Build", detail: "Compressed Archive (.tar.gz)" },
+  { key: "android", icon: "smartphone", title: "Android Package", lockedTitle: "Android APK", detail: "Direct Package Installer (.apk)" },
+];
+
+function downloadRowHTML(spec: DownloadSpec, href?: string): string {
+  const glyph = `<i data-lucide="${spec.icon}" class="download-row-glyph"></i>`;
+
+  if (href) {
+    const alt = spec.key === "linux" ? " dl-download-alt" : "";
+    return `
+      <div class="download-row">
+        <div class="download-row-main">
+          <div class="download-row-icon">${glyph}</div>
+          <div>
+            <p class="download-row-title">${spec.title}</p>
+            <p class="download-row-detail">${spec.detail}</p>
+          </div>
+        </div>
+        <a href="${href}" target="_blank" rel="noopener noreferrer" class="dl-download${alt}">
+          <i data-lucide="download" class="download-row-glyph"></i> Download
+        </a>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="download-row download-row-locked">
+      <div class="download-row-main">
+        <div class="download-row-icon download-row-icon-muted">${glyph}</div>
+        <div>
+          <p class="download-row-title">${spec.lockedTitle}</p>
+          <p class="download-row-detail">Upcoming Release</p>
+        </div>
+      </div>
+      <button disabled class="download-row-lock">
+        <i data-lucide="lock" class="download-row-glyph"></i> Locked
+      </button>
+    </div>
+  `;
+}
+
+function cliRowHTML(command: string): string {
+  return `
+    <div class="download-row cli-row">
+      <div class="download-row-main">
+        <div class="download-row-icon download-row-icon-neutral">
+          <i data-lucide="code" class="download-row-glyph"></i>
+        </div>
+        <div>
+          <p class="download-row-title">Console NPM Core</p>
+          <p class="download-row-detail">Global terminal setup</p>
+        </div>
+      </div>
+      <button onclick="navigator.clipboard.writeText('${command}'); showToastNotification('Command copied!');" class="download-row-copy" title="Copy to clipboard">
+        <i data-lucide="copy" class="download-row-glyph"></i> Copy Command
+      </button>
+    </div>
+    <code class="cli-command">
+      ${command}
+    </code>
+  `;
+}
+
+function downloadRowsHTML(project: typeof projects[0]): string {
+  const assets = project.downloadAssets;
+  if (!assets) return "";
+
+  const rows = DOWNLOAD_SPECS.map(spec => {
+    const href = assets[spec.key];
+    if (href) return downloadRowHTML(spec, href);
+    // Only Android-capable products announce a future APK.
+    const androidClaim = spec.key === "android" && (project.id === "sarthi" || project.platform.toLowerCase().includes("android"));
+    if (spec.key === "android" && !androidClaim) return "";
+    return downloadRowHTML(spec);
+  });
+
+  if (assets.cli) rows.push(cliRowHTML(assets.cli));
+  return rows.join("");
+}
+
 function projectChangelogHTML(project: typeof projects[0]): string {
   const events = buildGlobalActivityEvents([project]);
   if (events.length === 0) {
     return `
       <div class="pt-8 border-t border-[rgba(255,255,255,0.06)] space-y-6">
-        <div class="space-y-1">
-          <h3 class="text-xl font-sans font-semibold text-white flex items-center gap-2">
-            <i data-lucide="git-commit" class="w-5 h-5 text-blue-500"></i>
-            <span>GitHub-Style Version Timeline</span>
-          </h3>
-          <p class="text-xs text-[rgba(255,255,255,0.4)] font-mono">Commit-derived development events. Release badges appear only for verified releases.</p>
-        </div>
+        ${timelineHeaderHTML()}
         <div class="relative pl-1">
           <div class="activity-empty-state">
             <h3>No recorded changelog events</h3>
@@ -28,13 +127,7 @@ function projectChangelogHTML(project: typeof projects[0]): string {
 
   return `
     <div class="pt-8 border-t border-[rgba(255,255,255,0.06)] space-y-6">
-      <div class="space-y-1">
-        <h3 class="text-xl font-sans font-semibold text-white flex items-center gap-2">
-          <i data-lucide="git-commit" class="w-5 h-5 text-blue-500"></i>
-          <span>GitHub-Style Version Timeline</span>
-        </h3>
-        <p class="text-xs text-[rgba(255,255,255,0.4)] font-mono">Commit-derived development events. Release badges appear only for verified releases.</p>
-      </div>
+      ${timelineHeaderHTML()}
       <div class="relative pl-1">
         ${events.map(ev => {
           const type = getChangeTypeStyle(ev.changeType);
@@ -436,183 +529,7 @@ export function renderProjectPage(projectId: string) {
   const hasAssets = project.downloadAssets && (project.downloadAssets.windows || project.downloadAssets.mac || project.downloadAssets.linux || project.downloadAssets.android || project.downloadAssets.cli);
 
   // Build Download items list
-  let downloadItemsHTML = "";
-  if (project.downloadAssets) {
-    const assets = project.downloadAssets;
-
-    // Windows Build
-    if (assets.windows) {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] hover:border-blue-500/30 transition-all">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <i data-lucide="monitor" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-white">Windows Executable</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Installer (.exe) // Production Ready</p>
-            </div>
-          </div>
-          <a href="${assets.windows}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-600 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
-          </a>
-        </div>
-      `;
-    } else {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.02)] bg-[rgba(255,255,255,0.01)] opacity-50">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)]">
-              <i data-lucide="monitor" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-[rgba(255,255,255,0.5)]">Windows Installer</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.3)]">Upcoming Release</p>
-            </div>
-          </div>
-          <button disabled class="px-3 py-1.5 rounded bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.3)] text-xs font-mono cursor-not-allowed flex items-center gap-1">
-            <i data-lucide="lock" class="w-3.5 h-3.5"></i> Locked
-          </button>
-        </div>
-      `;
-    }
-
-    // macOS Build
-    if (assets.mac) {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] hover:border-indigo-500/30 transition-all">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <i data-lucide="laptop" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-white">macOS Build</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Disk Image (.dmg) // Apple Silicon & Intel</p>
-            </div>
-          </div>
-          <a href="${assets.mac}" target="_blank" class="dl-download text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
-          </a>
-        </div>
-      `;
-    } else {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.02)] bg-[rgba(255,255,255,0.01)] opacity-50">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)]">
-              <i data-lucide="laptop" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-[rgba(255,255,255,0.5)]">macOS DMG</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.3)]">Upcoming Release</p>
-            </div>
-          </div>
-          <button disabled class="px-3 py-1.5 rounded bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.3)] text-xs font-mono cursor-not-allowed flex items-center gap-1">
-            <i data-lucide="lock" class="w-3.5 h-3.5"></i> Locked
-          </button>
-        </div>
-      `;
-    }
-
-    // Linux Build
-    if (assets.linux) {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] hover:border-purple-500/30 transition-all">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              <i data-lucide="terminal" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-white">Linux Package</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Compressed Archive (.tar.gz)</p>
-            </div>
-          </div>
-          <a href="${assets.linux}" target="_blank" class="dl-download dl-download-alt text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
-          </a>
-        </div>
-      `;
-    } else {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.02)] bg-[rgba(255,255,255,0.01)] opacity-50">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)]">
-              <i data-lucide="terminal" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-[rgba(255,255,255,0.5)]">Linux Build</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.3)]">Upcoming Release</p>
-            </div>
-          </div>
-          <button disabled class="px-3 py-1.5 rounded bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.3)] text-xs font-mono cursor-not-allowed flex items-center gap-1">
-            <i data-lucide="lock" class="w-3.5 h-3.5"></i> Locked
-          </button>
-        </div>
-      `;
-    }
-
-    // Android Build
-    if (assets.android) {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] hover:border-emerald-500/30 transition-all">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i data-lucide="smartphone" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-white">Android Package</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Direct Package Installer (.apk)</p>
-            </div>
-          </div>
-          <a href="${assets.android}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-600 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
-          </a>
-        </div>
-      `;
-    } else if (project.id === "sarthi" || project.platform.toLowerCase().includes("android")) {
-      downloadItemsHTML += `
-        <div class="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.02)] bg-[rgba(255,255,255,0.01)] opacity-50">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)]">
-              <i data-lucide="smartphone" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-sm font-sans font-medium text-[rgba(255,255,255,0.5)]">Android APK</p>
-              <p class="text-xs font-mono text-[rgba(255,255,255,0.3)]">Upcoming Release</p>
-            </div>
-          </div>
-          <button disabled class="px-3 py-1.5 rounded bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.3)] text-xs font-mono cursor-not-allowed flex items-center gap-1">
-            <i data-lucide="lock" class="w-3.5 h-3.5"></i> Locked
-          </button>
-        </div>
-      `;
-    }
-
-    // CLI Engine Package
-    if (assets.cli) {
-      downloadItemsHTML += `
-        <div class="p-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.01)] hover:border-orange-500/30 transition-all flex flex-col gap-2.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                <i data-lucide="code" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <p class="text-sm font-sans font-medium text-white">Console NPM Core</p>
-                <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Global terminal setup</p>
-              </div>
-            </div>
-            <button onclick="navigator.clipboard.writeText('${assets.cli}'); showToastNotification('Command copied!');" class="p-2 rounded bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.7)] text-xs font-sans transition-all flex items-center gap-1.5" title="Copy to clipboard">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Command
-            </button>
-          </div>
-          <code class="block w-full p-2.5 rounded bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.05)] text-left font-mono text-xs text-orange-300 select-all overflow-x-auto whitespace-nowrap">
-            ${assets.cli}
-          </code>
-        </div>
-      `;
-    }
-  }
+  const downloadItemsHTML = downloadRowsHTML(project);
 
   // Find primary build action link to feature at the very top of download board
   let primaryCtaHTML = "";
@@ -639,27 +556,27 @@ export function renderProjectPage(projectId: string) {
     if (primaryUrl) {
       if (primaryUrl === "#copy-cli") {
         primaryCtaHTML = `
-          <button onclick="navigator.clipboard.writeText('${project.downloadAssets?.cli}'); showToastNotification('Command copied!');" class="w-full py-4 px-6 rounded-xl font-sans font-semibold text-base text-center text-white flex items-center justify-center gap-3 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-[1.01] shadow-lg shadow-blue-500/20 border border-blue-400/20">
-            <i data-lucide="copy" class="w-5 h-5 animate-pulse"></i>
+          <button onclick="navigator.clipboard.writeText('${project.downloadAssets?.cli}'); showToastNotification('Command copied!');" class="btn-download-primary">
+            <i data-lucide="copy" class="w-5 h-5"></i>
             <span>${primaryLabel}</span>
           </button>
         `;
       } else {
         primaryCtaHTML = `
-          <a href="${primaryUrl}" target="_blank" class="w-full py-4 px-6 rounded-xl font-sans font-semibold text-base text-center text-white flex items-center justify-center gap-3 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-[1.01] shadow-lg shadow-blue-500/20 border border-blue-400/20">
+          <a href="${primaryUrl}" target="_blank" rel="noopener noreferrer" class="btn-download-primary">
             <i data-lucide="download" class="w-5 h-5"></i>
-            <span>📥 Download Latest Release</span>
+            <span>Download Latest Release</span>
           </a>
-          <p class="text-center text-[11px] font-mono text-[rgba(255,255,255,0.4)]">Version ${project.version} // Production Compiled build</p>
+          <p class="download-note">Version ${project.version} // Production Compiled build</p>
         `;
       }
     } else {
       primaryCtaHTML = `
-        <button disabled class="w-full py-4 px-6 rounded-xl font-sans font-semibold text-base text-center text-[rgba(255,255,255,0.3)] flex items-center justify-center gap-3 transition-all duration-300 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] cursor-not-allowed flex items-center justify-center gap-2">
+        <button disabled class="btn-download-locked">
           <i data-lucide="lock" class="w-5 h-5"></i>
           <span>Build Under Construction</span>
         </button>
-        <p class="text-center text-[11px] font-mono text-[rgba(255,255,255,0.4)]">Next scheduled release: ${project.expectedNextRelease || 'Pending'}</p>
+        <p class="download-note">Next scheduled release: ${project.expectedNextRelease || 'Pending'}</p>
       `;
     }
   }
@@ -876,13 +793,9 @@ export function renderProjectPage(projectId: string) {
         </div>
 
         <div class="space-y-6">
-          <div class="p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.03] to-[rgba(0,0,0,0)] space-y-6 relative overflow-hidden">
-            <div class="absolute -top-12 -left-12 w-48 h-48 bg-blue-500/10 blur-[60px] pointer-events-none rounded-full"></div>
-
-            <div class="space-y-2 relative">
-              <span class="text-[10px] font-mono text-blue-400 uppercase tracking-widest flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Target Distribution Node
-              </span>
+          <div class="download-center">
+            <div class="space-y-2">
+              <p class="download-center-kicker">Target Distribution Node</p>
               <h3 class="text-xl font-sans font-semibold text-white">Download Center</h3>
               <p class="text-xs text-[rgba(255,255,255,0.5)]">Fetch compiled OS release builds for testing and execution.</p>
             </div>
@@ -891,9 +804,9 @@ export function renderProjectPage(projectId: string) {
               ${primaryCtaHTML}
             </div>
 
-            <div class="space-y-3 pt-2">
-              <h4 class="text-xs font-mono uppercase text-[rgba(255,255,255,0.4)] tracking-widest">Available Architectures</h4>
-              <div class="space-y-2">
+            <div class="download-list-area">
+              <h4 class="download-list-title">Available Architectures</h4>
+              <div class="download-list">
                 ${downloadItemsHTML}
               </div>
             </div>

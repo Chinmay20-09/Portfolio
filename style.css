@@ -4351,58 +4351,74 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
-   COMPONENT STYLES FOR TEMPLATE-ONLY MARKUP
-   (rendered from JS template strings, so they have no rule elsewhere)
+   CONTROL GEOMETRY, COLOUR ROLES, AND TARGET SIZES
+   Tailwind utilities used in these template strings are never emitted by this
+   build (src/index.css is not imported), so their treatment lives here: one
+   geometry block per behaviour, then colour only.
    ========================================================================== */
 
-.entry-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target-min);
-  margin-left: auto;
-  color: var(--accent-blue-text);
-  font-size: var(--text-xs);
+:root {
+  --accent-blue-fill: #2563EB;      /* filled surfaces carrying white text: 5.2:1 */
+  --accent-blue-fill-hover: #1D4ED8;
+  --accent-blue-text: #60A5FA;      /* accent as text on dark ground: 5.6:1 */
+  --category-purple-text: #A78BFA;  /* changelog category text on dark: 5.4:1 */
 }
 
-/* ==========================================================================
-   TARGET-SIZE CORRECTIONS
-   ========================================================================== */
-
-.nav-logo {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target-min);
+/* Light theme needs its own text/fill tonal steps: #60A5FA on white would fail. */
+[data-theme="light"] {
+  --accent-blue-fill: #0969DA;
+  --accent-blue-fill-hover: #0A5CBF;
+  --accent-blue-text: #0550AE;
+  --category-purple-text: #6639BA;
 }
 
-.activity-title a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target-min);
-}
-
-/* ==========================================================================
-   ACTION BUTTONS (catalog + project detail)
-   Tailwind utilities used in these template strings are not emitted by this
-   build (src/index.css is never imported), so their treatment lives here.
-   ========================================================================== */
-
+/* Interaction floor: every compact control shares one declaration block. */
+.nav-logo,
+.entry-link,
+.activity-title a,
+.shipping-cta,
+.detail-action,
+.card-actions a,
+.card-actions-released a,
 .dl-primary,
+.dl-secondary,
 .dl-download {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: var(--target-min);
+}
+
+/* One box for every boxed action. */
+.shipping-cta,
+.dl-primary,
+.dl-secondary,
+.dl-download {
   padding: 10px 16px;
   border-radius: var(--radius-sm);
-  background-color: var(--accent-blue);
-  color: #FFFFFF;
-  font-weight: 600;
   border: 1px solid transparent;
 }
 
+.shipping-cta {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+}
+
+/* Colour roles only: the accent is a fill here, never a gradient. */
+.dl-primary,
+.dl-download,
+.shipping-cta,
+.btn-download-primary {
+  background-color: var(--accent-blue-fill);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
 .dl-primary:hover,
-.dl-download:hover {
-  background-color: #4b8ef8;
+.dl-download:hover,
+.shipping-cta:hover,
+.btn-download-primary:hover {
+  background-color: var(--accent-blue-fill-hover);
 }
 
 .dl-download-alt {
@@ -4413,15 +4429,10 @@ button, input, select, textarea {
   background-color: #475569;
 }
 
-.dl-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--target-min);
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--card-border);
+.dl-secondary,
+.btn-secondary {
   background-color: var(--card-bg);
+  border-color: var(--card-border);
   color: var(--text-secondary);
 }
 
@@ -4430,41 +4441,7 @@ button, input, select, textarea {
   border-color: var(--card-border-hover);
 }
 
-/* ==========================================================================
-   CONTRAST FIXES (from the skill's parsed-page scan)
-   The raw palette works for fills and borders, but not as small text on dark:
-   #3B82F6 as text and #8B5CF6 as text both landed near 4:1. These are tonal
-   steps for text/fill roles only, added to DESIGN.md.
-   ========================================================================== */
-
-:root {
-  --accent-blue-fill: #2563EB;      /* filled surfaces carrying white text: 5.2:1 */
-  --accent-blue-fill-hover: #1D4ED8;
-  --accent-blue-text: #60A5FA;      /* accent as text on dark ground: 5.6:1 */
-  --category-purple-text: #A78BFA;  /* changelog category text on dark: 5.4:1 */
-}
-
-.dl-primary,
-.dl-primary:hover,
-.dl-download,
-.shipping-cta,
-.btn-download-primary {
-  background-color: var(--accent-blue-fill);
-  color: #FFFFFF;
-}
-
-.dl-primary:hover,
-.dl-download:hover,
-.shipping-cta:hover,
-.btn-download-primary:hover {
-  background-color: var(--accent-blue-fill-hover);
-}
-
-.dl-secondary,
-.btn-secondary {
-  color: var(--text-secondary);
-}
-
+/* Links on the dark ground use the text tonal step, not the fill accent. */
 .entry-link,
 .activity-footer-link:hover,
 .card a:not(.dl-primary):not(.dl-secondary):not(.dl-download),
@@ -4473,12 +4450,17 @@ button, input, select, textarea {
   color: var(--accent-blue-text);
 }
 
+.entry-link {
+  margin-left: auto;
+  font-size: var(--text-xs);
+}
+
 .badge-feature {
   color: var(--category-purple-text);
 }
 
-/* Per-project gradients vary, so the caption carries its own scrim instead of
-   relying on the plate's overlay: any future bright colorTheme stays readable. */
+/* Per-project plate gradients vary, so the caption carries its own scrim
+   instead of relying on the plate overlay. */
 .card-hero-label {
   position: absolute;
   bottom: 12px;
@@ -4494,17 +4476,7 @@ button, input, select, textarea {
   letter-spacing: 0.14em;
 }
 
-/* Light theme needs its own text/fill tonal steps: #60A5FA on white would fail. */
-[data-theme="light"] {
-  --accent-blue-fill: #0969DA;
-  --accent-blue-fill-hover: #0A5CBF;
-  --accent-blue-text: #0550AE;
-  --category-purple-text: #6639BA;
-}
-
-/* Measure cap: long-form paragraphs were rendering ~101–105 characters per line
-   at 1440px, past the 65–75ch reading measure. 72ch keeps prose readable without
-   touching layout containers. */
+/* Measure cap: uncapped prose rendered ~101-105 characters per line at 1440px. */
 p {
   max-width: 72ch;
 }
