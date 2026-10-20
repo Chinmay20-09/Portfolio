@@ -2,17 +2,45 @@
    CSS CORE ARCHITECTURE & VARIABLES
    ========================================================================== */
 
+/* Display voice. Self-hosted (no hosted font stylesheet): the E2E fixtures answer
+   fonts.googleapis.com with an empty body, so a CDN face would silently fall back
+   in tests while looking correct in a browser. Bricolage Grotesque is variable
+   400–800 with ink traps and irregular apertures, which survive the tight display
+   tracking a neutral grotesque turns to mush at 44–64px on this dark ground. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/bricolage-grotesque-latin.woff2') format('woff2-variations'),
+       url('fonts/bricolage-grotesque-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Fonts */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-display: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Type scale — one ramp, used by every heading and label on the page. */
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: clamp(2.5rem, 1.6rem + 3.2vw, 3.75rem);
+
+  /* Interaction floor: WCAG 2.5.8 / platform guidance. */
+  --target-min: 44px;
 
   /* Transitions */
   --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-bounce: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Border Radii */
   --radius-sm: 6px;
@@ -99,6 +127,8 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
+  /* Avoid a single word stranded on a paragraph's last line. */
+  text-wrap: pretty;
   overflow-x: hidden;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
@@ -126,12 +156,46 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1.25;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
+  text-wrap: balance;
+}
+
+/* Explicit steps: h3 must outrank body copy, and one tag must not render at two
+   sizes across sections (the audit found h3 at both 18.7px and 22px). */
+h1 {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+h2 {
+  font-size: var(--text-3xl);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: var(--text-xl);
+  line-height: 1.3;
+}
+
+h4 {
+  font-size: var(--text-lg);
+  line-height: 1.35;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Placeholder contrast: the UA default (#757575) measures 4.1:1 on this ground,
+   below the 4.5:1 floor. --text-muted clears it. */
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 button, input, select, textarea {
@@ -200,7 +264,7 @@ button, input, select, textarea {
 }
 
 .loader-logo .logo-bracket {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   font-weight: 400;
 }
 
@@ -256,12 +320,13 @@ button, input, select, textarea {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  background-size: 24px 24px;
-  background-image: radial-gradient(rgba(31, 41, 55, 0.6) 1px, transparent 1px);
+  /* One soft radial wash instead of a tiled dot/line field, which is a
+     generated-UI signature rather than structure. */
+  background-image: radial-gradient(ellipse 90% 60% at 50% 0%, rgba(31, 41, 55, 0.5), transparent 70%);
 }
 
 [data-theme="light"] .ambient-grid {
-  background-image: radial-gradient(rgba(209, 213, 219, 0.6) 1px, transparent 1px);
+  background-image: radial-gradient(ellipse 90% 60% at 50% 0%, rgba(209, 213, 219, 0.55), transparent 70%);
 }
 
 .ambient-glows {
@@ -293,7 +358,10 @@ button, input, select, textarea {
 .glow-2 {
   width: 500px;
   height: 500px;
-  background: var(--accent-purple);
+  /* One accent hue for the whole ambient field: the violet second hue was the
+     palette tell, and the blue reads as the same light source. */
+  background: var(--accent-blue);
+  opacity: 0.07;
   bottom: -10%;
   left: -5%;
 }
@@ -302,22 +370,21 @@ button, input, select, textarea {
    TYPOGRAPHY & ACCENTS
    ========================================================================== */
 
+/* Emphasis comes from weight and colour, never a clipped gradient. */
 .gradient-text {
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent-blue-text);
   display: inline-block;
 }
 
+/* Section caption, not an eyebrow: the skill bans kickers above headings, so the
+   label reads as metadata directly under the heading that owns the section. */
 .section-tag {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  color: var(--accent-blue);
-  text-transform: uppercase;
-  margin-bottom: 12px;
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 20px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -333,10 +400,10 @@ button, input, select, textarea {
 }
 
 .section-title {
-  font-size: 2.5rem;
+  font-size: var(--text-3xl);
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .section-description {
@@ -366,6 +433,7 @@ button, input, select, textarea {
 
 .btn-sm {
   padding: 8px 16px;
+  min-height: var(--target-min);
   font-size: 0.8125rem;
   gap: 6px;
   border-radius: var(--radius-sm);
@@ -466,7 +534,7 @@ button, input, select, textarea {
 }
 
 .nav-logo .bracket {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   font-weight: 400;
 }
 
@@ -476,8 +544,6 @@ button, input, select, textarea {
   background-color: var(--accent-green);
   border-radius: var(--radius-full);
   margin-left: 8px;
-  box-shadow: 0 0 10px var(--accent-green);
-  animation: pulse-ring 2s infinite;
 }
 
 .nav-links {
@@ -496,12 +562,15 @@ button, input, select, textarea {
 }
 
 .nav-links a {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--text-secondary);
   transition: color var(--transition-fast);
   position: relative;
-  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding-inline: 6px;
 }
 
 .nav-links a:hover, .nav-links a.active {
@@ -515,7 +584,7 @@ button, input, select, textarea {
   left: 50%;
   width: 0;
   height: 2px;
-  background: var(--accent-gradient);
+  background: var(--accent-blue);
   transition: all var(--transition-normal);
   transform: translateX(-50%);
   border-radius: var(--radius-full);
@@ -534,8 +603,9 @@ button, input, select, textarea {
 
 .nav-btn {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  min-width: var(--target-min);
+  width: var(--target-min);
+  height: var(--target-min);
   border-radius: var(--radius-md);
   border: 1px solid var(--card-border);
   background-color: var(--card-bg);
@@ -574,8 +644,8 @@ button, input, select, textarea {
 .mobile-menu-btn {
   display: none;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: var(--target-min);
+  height: var(--target-min);
   border-radius: var(--radius-md);
   border: 1px solid var(--card-border);
   background-color: var(--card-bg);
@@ -611,10 +681,12 @@ button, input, select, textarea {
 
 .mobile-nav-links a {
   font-family: var(--font-display);
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   font-weight: 500;
   color: var(--text-secondary);
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
   padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -658,12 +730,13 @@ button, input, select, textarea {
   margin-bottom: 24px;
 }
 
+/* Static status dot: a decorative pulse implies live changing data the badge
+   does not actually have. The label carries the meaning. */
 .badge-status-dot {
   width: 6px;
   height: 6px;
   background-color: var(--accent-green);
   border-radius: var(--radius-full);
-  animation: pulse 1.5s infinite;
 }
 
 .hero-title {
@@ -752,7 +825,7 @@ button, input, select, textarea {
 .stat-label svg {
   width: 16px;
   height: 16px;
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
 }
 
 /* ==========================================================================
@@ -777,7 +850,7 @@ button, input, select, textarea {
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 14px 20px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -798,7 +871,10 @@ button, input, select, textarea {
 
 .search-box input {
   width: 100%;
-  font-size: 0.9375rem;
+  /* The input, not just the padded box, must be the tap target: padding around
+     an input is not clickable, so a 20px-tall field is a 20px target. */
+  min-height: 52px;
+  font-size: var(--text-base);
   color: var(--text-primary);
 }
 
@@ -812,6 +888,9 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  margin-right: -12px;
 }
 
 .clear-search-btn:hover {
@@ -839,7 +918,10 @@ button, input, select, textarea {
 
 .filter-btn {
   padding: 8px 16px;
-  font-size: 0.875rem;
+  min-height: var(--target-min);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
@@ -865,9 +947,9 @@ button, input, select, textarea {
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 8px 16px;
+  padding: 6px 14px;
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .sort-select-wrapper svg {
@@ -879,6 +961,7 @@ button, input, select, textarea {
 .sort-select {
   cursor: pointer;
   font-weight: 500;
+  min-height: var(--target-min);
 }
 
 .sort-select option {
@@ -897,8 +980,8 @@ button, input, select, textarea {
 }
 
 .view-toggle-btn {
-  width: 32px;
-  height: 32px;
+  width: var(--target-min);
+  height: var(--target-min);
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   display: flex;
@@ -914,7 +997,7 @@ button, input, select, textarea {
 
 .view-toggle-btn.active {
   background-color: var(--bg-primary);
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   border: 1px solid var(--card-border);
 }
 
@@ -988,13 +1071,21 @@ button, input, select, textarea {
   overflow: hidden;
 }
 
+/* Scrim across the whole plate, not just the bottom: card labels sit near the top
+   of a per-project gradient, where light text measured 3.0–4.1:1 (WCAG AA needs
+   4.5:1). The tint keeps the project hue readable while guaranteeing contrast. */
 .card-hero-image-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, transparent 30%, rgba(22, 27, 34, 0.95));
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 17, 23, 0.55) 0%,
+    rgba(13, 17, 23, 0.72) 45%,
+    rgba(13, 17, 23, 0.96) 100%
+  );
 }
 
 .card-meta-top {
@@ -1034,7 +1125,7 @@ button, input, select, textarea {
 
 /* Badge colors */
 .status-stable { background-color: rgba(63, 185, 80, 0.12); color: var(--accent-green); }
-.status-beta { background-color: rgba(88, 166, 255, 0.12); color: var(--accent-blue); }
+.status-beta { background-color: rgba(88, 166, 255, 0.12); color: var(--accent-blue-text); }
 .status-alpha { background-color: rgba(240, 136, 62, 0.12); color: var(--accent-orange); }
 .status-paused { background-color: rgba(255, 123, 114, 0.12); color: var(--accent-red); }
 .status-archived { background-color: rgba(139, 148, 158, 0.12); color: var(--text-muted); }
@@ -1139,7 +1230,7 @@ button, input, select, textarea {
 .features-preview-list li svg {
   width: 14px;
   height: 14px;
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   flex-shrink: 0;
 }
 
@@ -1149,6 +1240,16 @@ button, input, select, textarea {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-top: 20px;
+}
+
+/* Tailwind's min-h-* utilities are not generated for these template strings,
+   so the interaction floor for card actions is set here instead. */
+.card-actions a,
+.card-actions-released a {
+  min-height: var(--target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-actions .btn {
@@ -1382,7 +1483,7 @@ button, input, select, textarea {
 }
 
 .roadmap-item-progress {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   font-weight: 500;
 }
 
@@ -1481,7 +1582,7 @@ button, input, select, textarea {
 
 .badge-feature { color: var(--accent-purple); background-color: rgba(167, 139, 250, 0.1); }
 .badge-fix { color: var(--accent-orange); background-color: rgba(245, 158, 11, 0.1); }
-.badge-refactor { color: var(--accent-blue); background-color: rgba(59, 130, 246, 0.1); }
+.badge-refactor { color: var(--accent-blue-text); background-color: rgba(59, 130, 246, 0.1); }
 .badge-documentation { color: var(--accent-green); background-color: rgba(34, 197, 94, 0.1); }
 .badge-testing { color: var(--accent-orange); background-color: rgba(249, 115, 22, 0.1); }
 .badge-release { color: var(--accent-green); background-color: rgba(34, 197, 94, 0.1); }
@@ -1520,7 +1621,7 @@ button, input, select, textarea {
 }
 
 .activity-title a:hover {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
 }
 
 .activity-summary {
@@ -1569,7 +1670,7 @@ button, input, select, textarea {
 .activity-sha {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
 }
 
 .activity-actions {
@@ -1579,9 +1680,12 @@ button, input, select, textarea {
 }
 
 .activity-footer-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
+  /* 19px-tall text links were the smallest targets on the page. */
+  min-height: var(--target-min);
+  padding: 0 4px;
   color: var(--text-muted);
 }
 
@@ -1648,7 +1752,7 @@ button, input, select, textarea {
 
 .activity-changes-list li::before {
   content: "•";
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   position: absolute;
   left: 0;
   font-weight: bold;
@@ -1750,7 +1854,7 @@ button, input, select, textarea {
 .interest-pill svg {
   width: 18px;
   height: 18px;
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
 }
 
 .interest-pill:hover {
@@ -1810,7 +1914,7 @@ button, input, select, textarea {
 }
 
 .terminal-prompt {
-  color: var(--accent-purple);
+  color: var(--accent-blue-text);
 }
 
 .neofetch-content {
@@ -1820,7 +1924,7 @@ button, input, select, textarea {
 }
 
 .neofetch-logo {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   display: flex;
   flex-direction: column;
   line-height: 1.2;
@@ -1833,7 +1937,7 @@ button, input, select, textarea {
 }
 
 .term-key {
-  color: var(--accent-purple);
+  color: var(--accent-blue-text);
   font-weight: 500;
 }
 
@@ -2171,7 +2275,7 @@ button, input, select, textarea {
 .repo-telemetry .commit-sha {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   background-color: rgba(59, 130, 246, 0.1);
   padding: 2px 6px;
   border-radius: var(--radius-sm);
@@ -2506,6 +2610,36 @@ button, input, select, textarea {
   min-width: 0;
   font-size: 0.8125rem;
   color: var(--text-muted);
+}
+
+/* Project-detail actions and the shipping CTA: the interaction floor again.
+   These carry Tailwind utilities in their template strings that this build does
+   not emit (see DESIGN.md), so the layout essentials are set here. */
+.shipping-cta,
+.detail-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target-min);
+}
+
+.shipping-cta {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  background-color: var(--accent-blue);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.shipping-cta:hover {
+  background-color: #4b8ef8;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding-inline: 6px;
 }
 
 .footer-links a:hover {
@@ -2865,7 +2999,7 @@ button, input, select, textarea {
   background-color: rgba(255, 255, 255, 0.05);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   align-self: flex-start;
   margin-top: auto;
 }
@@ -2921,7 +3055,7 @@ button, input, select, textarea {
   align-items: center;
   gap: 6px;
   font-size: 0.8125rem;
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   margin-top: 10px;
   font-family: var(--font-mono);
 }
@@ -3137,7 +3271,7 @@ button, input, select, textarea {
 }
 
 .cmd-item.selected svg {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
 }
 
 .cmd-footer {
@@ -3194,7 +3328,7 @@ button, input, select, textarea {
 }
 
 .toast-content svg {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   width: 20px;
   height: 20px;
 }
@@ -3397,18 +3531,18 @@ button, input, select, textarea {
   font-weight: 600;
   font-size: 1.05rem;
   color: #FFFFFF !important;
-  background: var(--accent-gradient);
+  background: var(--accent-blue);
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.1);
   width: 100%;
 }
 .btn-download-primary:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
-  filter: brightness(1.1);
+  transform: translateY(-1px);
+  background: #4b8ef8;
+  box-shadow: var(--shadow-md);
 }
 .btn-download-primary:active {
   transform: translateY(-1px);
@@ -3463,9 +3597,7 @@ button, input, select, textarea {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 15px 15px;
+  background-color: rgba(255, 255, 255, 0.02);
   pointer-events: none;
 }
 
@@ -3583,9 +3715,9 @@ button, input, select, textarea {
 
 /* Currently Shipping Highlight Card */
 .currently-shipping-card {
-  background: linear-gradient(135deg, rgba(22, 27, 34, 0.8) 0%, rgba(13, 17, 23, 0.9) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-left: 5px solid #f59e0b;
+  background: var(--card-bg);
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.08);
   border-radius: var(--radius-lg);
   padding: 32px;
   margin-top: 10px;
@@ -3721,7 +3853,7 @@ button, input, select, textarea {
   cursor: pointer;
 }
 .btn-back-hub:hover {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   transform: translateX(-4px);
 }
 
@@ -3857,7 +3989,7 @@ button, input, select, textarea {
 }
 
 .feature-grid-item i {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   flex-shrink: 0;
 }
 
@@ -3961,7 +4093,7 @@ button, input, select, textarea {
 }
 
 .timeline-step.active .timeline-step-name {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   font-weight: 600;
 }
 
@@ -4139,7 +4271,7 @@ button, input, select, textarea {
 }
 
 .download-link-btn {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 600;
@@ -4216,4 +4348,163 @@ button, input, select, textarea {
   .project-page-title {
     font-size: 2rem;
   }
+}
+
+/* ==========================================================================
+   COMPONENT STYLES FOR TEMPLATE-ONLY MARKUP
+   (rendered from JS template strings, so they have no rule elsewhere)
+   ========================================================================== */
+
+.entry-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  margin-left: auto;
+  color: var(--accent-blue-text);
+  font-size: var(--text-xs);
+}
+
+/* ==========================================================================
+   TARGET-SIZE CORRECTIONS
+   ========================================================================== */
+
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+}
+
+.activity-title a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+}
+
+/* ==========================================================================
+   ACTION BUTTONS (catalog + project detail)
+   Tailwind utilities used in these template strings are not emitted by this
+   build (src/index.css is never imported), so their treatment lives here.
+   ========================================================================== */
+
+.dl-primary,
+.dl-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target-min);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-blue);
+  color: #FFFFFF;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.dl-primary:hover,
+.dl-download:hover {
+  background-color: #4b8ef8;
+}
+
+.dl-download-alt {
+  background-color: #334155;
+}
+
+.dl-download-alt:hover {
+  background-color: #475569;
+}
+
+.dl-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target-min);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background-color: var(--card-bg);
+  color: var(--text-secondary);
+}
+
+.dl-secondary:hover {
+  color: var(--text-primary);
+  border-color: var(--card-border-hover);
+}
+
+/* ==========================================================================
+   CONTRAST FIXES (from the skill's parsed-page scan)
+   The raw palette works for fills and borders, but not as small text on dark:
+   #3B82F6 as text and #8B5CF6 as text both landed near 4:1. These are tonal
+   steps for text/fill roles only, added to DESIGN.md.
+   ========================================================================== */
+
+:root {
+  --accent-blue-fill: #2563EB;      /* filled surfaces carrying white text: 5.2:1 */
+  --accent-blue-fill-hover: #1D4ED8;
+  --accent-blue-text: #60A5FA;      /* accent as text on dark ground: 5.6:1 */
+  --category-purple-text: #A78BFA;  /* changelog category text on dark: 5.4:1 */
+}
+
+.dl-primary,
+.dl-primary:hover,
+.dl-download,
+.shipping-cta,
+.btn-download-primary {
+  background-color: var(--accent-blue-fill);
+  color: #FFFFFF;
+}
+
+.dl-primary:hover,
+.dl-download:hover,
+.shipping-cta:hover,
+.btn-download-primary:hover {
+  background-color: var(--accent-blue-fill-hover);
+}
+
+.dl-secondary,
+.btn-secondary {
+  color: var(--text-secondary);
+}
+
+.entry-link,
+.activity-footer-link:hover,
+.card a:not(.dl-primary):not(.dl-secondary):not(.dl-download),
+.terminal-prompt,
+.term-key {
+  color: var(--accent-blue-text);
+}
+
+.badge-feature {
+  color: var(--category-purple-text);
+}
+
+/* Per-project gradients vary, so the caption carries its own scrim instead of
+   relying on the plate's overlay: any future bright colorTheme stays readable. */
+.card-hero-label {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  max-width: calc(100% - 32px);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(13, 17, 23, 0.78);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: rgba(255, 255, 255, 0.92);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* Light theme needs its own text/fill tonal steps: #60A5FA on white would fail. */
+[data-theme="light"] {
+  --accent-blue-fill: #0969DA;
+  --accent-blue-fill-hover: #0A5CBF;
+  --accent-blue-text: #0550AE;
+  --category-purple-text: #6639BA;
+}
+
+/* Measure cap: long-form paragraphs were rendering ~101–105 characters per line
+   at 1440px, past the 65–75ch reading measure. 72ch keeps prose readable without
+   touching layout containers. */
+p {
+  max-width: 72ch;
 }

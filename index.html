@@ -9,7 +9,10 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- JetBrains Mono only: Inter and Space Grotesk were loaded but referenced nowhere
+       in the CSS, so they cost a render-blocking request for nothing. The display face
+       (Bricolage Grotesque) is self-hosted — see style.css. -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- Lucide Icons (CDN for Vanilla JS) -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -132,8 +135,8 @@
         <div id="currently-shipping-wrapper" class="currently-shipping-wrapper animate-on-scroll"></div>
 
         <div class="section-header animate-on-scroll">
-          <div class="section-tag">CATALOG</div>
             <h2 class="section-title">Things I’m building</h2>
+          <p class="section-tag">Catalog</p>
           <p class="section-description">
             A selection of projects driven by the problems I care about: making AI workflows easier to reason about, useful tools work offline, and infrastructure easier to understand.
           </p>
@@ -188,8 +191,8 @@
     <section id="roadmap" class="roadmap-section">
       <div class="container">
         <div class="section-header animate-on-scroll">
-          <div class="section-tag">TIMELINE</div>
             <h2 class="section-title">Project roadmap</h2>
+          <p class="section-tag">Timeline</p>
           <p class="section-description">
             The lifecycle pipeline of my software suite. See where each project stands—from raw ideation and active planning to test phases and production deployment.
           </p>
@@ -210,7 +213,7 @@
 
             <div class="roadmap-col" data-stage="Planning">
               <div class="roadmap-col-header">
-                <span class="roadmap-col-bullet" style="background-color: var(--accent-purple);"></span>
+                <span class="roadmap-col-bullet" style="background-color: var(--text-secondary);"></span>
                 <h3>Planning</h3>
                 <span class="roadmap-col-count">0</span>
               </div>
@@ -261,8 +264,8 @@
     <section id="activity" class="activity-section">
       <div class="container">
         <div class="section-header animate-on-scroll">
-          <div class="section-tag">TELEMETRY</div>
             <h2 class="section-title">Notes from the build</h2>
+          <p class="section-tag">Telemetry</p>
           <p class="section-description">
             Recent changes across the projects, including what I’ve added, improved, and learned along the way.
           </p>
@@ -281,8 +284,8 @@
     <section id="about" class="about-section">
       <div class="container">
         <div class="section-header animate-on-scroll">
-          <div class="section-tag">ENGINEER</div>
           <h2 class="section-title">A little about how I build</h2>
+          <p class="section-tag">Engineer</p>
           <p class="section-description">
             I’m Chinmay Kolte. I like taking a fuzzy problem, understanding its constraints, and turning it into a tool that feels clear and dependable.
           </p>
@@ -382,8 +385,8 @@
     <section id="contact" class="contact-section">
       <div class="container">
         <div class="section-header animate-on-scroll">
-          <div class="section-tag">COMMUNICATION</div>
           <h2 class="section-title">Let?s talk</h2>
+          <p class="section-tag">Communication</p>
           <p class="section-description">
             Have a question about a project, an idea to share, or want to collaborate? I?d be glad to hear from you.
           </p>

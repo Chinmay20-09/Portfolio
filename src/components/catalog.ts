@@ -152,7 +152,7 @@ export function renderProjectCatalog() {
     const coverMarkup = state.viewMode === "grid" ? `
       <div class="card-hero-image" style="background: ${proj.colorTheme || 'var(--accent-gradient)'};">
         <div class="card-hero-image-overlay"></div>
-        <div style="position: absolute; bottom: 12px; left: 16px; font-family: var(--font-mono); font-size: 0.625rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.2em;">
+        <div class="card-hero-label">
           ENGINE MODEL // ${proj.id}
         </div>
       </div>
@@ -212,11 +212,11 @@ export function renderProjectCatalog() {
 
       actionButtonsMarkup = `
         <div class="card-actions-released flex flex-col gap-2 w-full pt-4">
-          <a href="${downloadUrl}" target="_blank" class="w-full py-2.5 px-4 rounded-lg font-sans font-semibold text-xs text-center text-white flex items-center justify-center gap-2 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-[1.02] shadow-md shadow-blue-500/10" ${hasDownload ? '' : 'style="pointer-events: none; opacity: 0.4;"'}>
+          <a href="${downloadUrl}" target="_blank" class="dl-primary w-full px-4 rounded-lg font-sans font-semibold text-xs text-center text-white flex items-center justify-center gap-2 transition-all duration-300 shadow-md" ${hasDownload ? '' : 'style="pointer-events: none; opacity: 0.4;"'}>
             <i data-lucide="download" class="w-4 h-4"></i>
             <span>📥 Download Build</span>
           </a>
-          <a href="#/project/${proj.id}" class="w-full py-2 px-4 rounded-lg font-sans font-medium text-xs text-center text-[rgba(255,255,255,0.7)] flex items-center justify-center gap-2 transition-all border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.06)] hover:text-white">
+          <a href="#/project/${proj.id}" class="dl-secondary w-full px-4 rounded-lg font-sans font-medium text-xs text-center flex items-center justify-center gap-2 transition-all">
             <i data-lucide="layers" class="w-3.5 h-3.5"></i> Explore Details
           </a>
         </div>
@@ -380,7 +380,7 @@ export function renderCurrentlyShipping() {
         </div>
 
         <div class="space-y-1">
-          <h3 class="text-2xl font-sans font-semibold tracking-tight text-white">${shipProject.name}</h3>
+          <h2 class="text-2xl font-sans font-semibold tracking-tight text-white">${shipProject.name}</h2>
           <p class="text-sm font-mono text-[rgba(255,255,255,0.4)] uppercase tracking-wider">Next Release Expected: ${shipProject.expectedNextRelease || 'Upcoming'}</p>
         </div>
 
@@ -398,7 +398,7 @@ export function renderCurrentlyShipping() {
       </div>
 
       <div class="w-full md:w-auto shrink-0 flex flex-col gap-3 min-w-[200px]">
-        <a href="#/project/${shipProject.id}" class="w-full py-3 px-6 rounded-lg font-sans font-medium text-sm text-center text-white flex items-center justify-center gap-2 transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-600 hover:scale-[1.02] shadow-lg shadow-blue-500/20">
+        <a href="#/project/${shipProject.id}" class="w-full shipping-cta py-3 px-6 rounded-lg font-sans font-medium text-sm text-center text-white flex items-center justify-center gap-2 transition-all duration-300 bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] shadow-lg shadow-blue-500/20">
           <span>Explore Product</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
@@ -490,7 +490,7 @@ export function renderProjectPage(projectId: string) {
               <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Disk Image (.dmg) // Apple Silicon & Intel</p>
             </div>
           </div>
-          <a href="${assets.mac}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
+          <a href="${assets.mac}" target="_blank" class="dl-download text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
           </a>
         </div>
@@ -527,7 +527,7 @@ export function renderProjectPage(projectId: string) {
               <p class="text-xs font-mono text-[rgba(255,255,255,0.4)]">Compressed Archive (.tar.gz)</p>
             </div>
           </div>
-          <a href="${assets.linux}" target="_blank" class="px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 hover:scale-[1.02] text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
+          <a href="${assets.linux}" target="_blank" class="dl-download dl-download-alt text-xs font-sans font-semibold text-white transition-all flex items-center gap-1.5">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
           </a>
         </div>
@@ -905,7 +905,7 @@ export function renderProjectPage(projectId: string) {
             </h4>
 
             <div class="flex flex-col gap-2">
-              <a href="${project.githubUrl}" target="_blank" class="w-full py-2.5 px-4 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] text-xs text-white font-sans font-medium flex items-center justify-between transition-all">
+              <a href="${project.githubUrl}" target="_blank" class="detail-action w-full py-2.5 px-4 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] text-xs text-white font-sans font-medium flex items-center justify-between transition-all">
                 <span class="flex items-center gap-2">
                   <i data-lucide="github" class="w-4 h-4"></i> Explore Source Code
                 </span>
