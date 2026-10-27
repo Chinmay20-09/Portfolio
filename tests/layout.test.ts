@@ -15,6 +15,17 @@ function ruleBlocks(selector: string): string[] {
 
 const allDeclarations = (selector: string) => ruleBlocks(selector).join('\n').toLowerCase();
 
+describe('currently shipping card', () => {
+  it('declares one box-shadow that keeps both the inner ring and the outer glow', () => {
+    const block = ruleBlocks('.currently-shipping-card')[0] ?? '';
+    const shadows = [...block.matchAll(/box-shadow\s*:\s*([^;]+);/g)].map(match => match[1]);
+    // A second `box-shadow` in the same rule would silently drop the first layer.
+    expect(shadows).toHaveLength(1);
+    expect(shadows[0]).toContain('inset 0 0 0 1px rgba(245, 158, 11, 0.08)');
+    expect(shadows[0]).toContain('0 8px 32px rgba(245, 158, 11, 0.05)');
+  });
+});
+
 describe('mobile horizontal overflow guards', () => {
   it('lets the contact grid tracks shrink below their content width', () => {
     const grid = allDeclarations('.contact-grid');
