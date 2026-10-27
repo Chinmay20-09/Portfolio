@@ -11,6 +11,7 @@ export const DOM = {
   loaderBar: document.getElementById("loader-bar") as HTMLElement,
   loaderStatus: document.getElementById("loader-status") as HTMLElement,
   mouseGlow: document.getElementById("mouse-glow") as HTMLElement,
+  scrollBg: document.getElementById("scroll-bg") as HTMLElement,
   navbar: document.getElementById("navbar") as HTMLElement,
   mobileMenuToggle: document.getElementById("mobile-menu-toggle") as HTMLElement,
   mobileMenu: document.getElementById("mobile-menu") as HTMLElement,

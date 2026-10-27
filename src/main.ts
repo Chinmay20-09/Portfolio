@@ -22,6 +22,7 @@ import {
 } from './components/catalog';
 import { renderRoadmapBoard } from './components/roadmap';
 import { renderGlobalActivityFeed } from './components/activity';
+import { initScrollBackground } from './components/scrollBackground';
 import { 
   initCommandPaletteDynamicList, 
   openCommandPalette, 
@@ -397,6 +398,7 @@ function initApp() {
   // Initialize animations
   initStatsCounters();
   initScrollAnimations();
+  initScrollBackground(DOM.scrollBg);
 
   // Dismount Loader Screen
   if (DOM.loadingScreen) {

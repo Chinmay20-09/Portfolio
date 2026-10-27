@@ -99,7 +99,7 @@ The design's job is to make six real projects, their lifecycle stage, and their 
 
 ## Colors
 
-- **Ground:** `#0D1117` for page and section ground, flat — not a gradient. Ambient depth comes from two blurred fields, both tinted the same accent hue (`.glow-1`, `.glow-2`), so the page reads as one light source.
+- **Ground:** `#0D1117` for page and section ground, flat — not a gradient. Ambient depth comes from `.scroll-bg`, a fixed panel of one flat accent hue revealed through the traced frame sequence in `public/frames/` as the page scrolls, so the page still reads as one light source. It carries no blur and no gradient, and it paints at `z-index: -1` so the artwork never crosses text.
 - **Surfaces:** cards use `rgba(22, 27, 34, 0.7)` with a `rgba(240, 246, 252, 0.1)` hairline. Hover raises the border to accent-tinted `rgba(59, 130, 246, 0.4)` and the fill to `rgba(30, 36, 44, 0.85)`.
 - **Text:** `#E6EDF3` primary, `#C9D1D9` secondary, `#8B949E` muted. Muted text is used only at metadata sizes where contrast still clears 4.5:1 against the card fill.
 - **One accent, split by role (added after the parsed-page contrast scan):** `#3B82F6` is the *structural* accent — borders, underlines, focus rings, node dots. Because it measures only 3.7:1 behind white text and 4.0:1 as small text on a dark card, it is no longer used for either. Filled surfaces carrying white text use `--accent-blue-fill` `#2563EB` (5.2:1, hover `#1D4ED8`); accent-coloured **text** uses `--accent-blue-text` `#60A5FA` (5.6:1). The light theme overrides both with darker steps (`#0969DA` fill, `#0550AE` text).

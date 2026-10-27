@@ -312,58 +312,46 @@ button, input, select, textarea {
   transition: opacity 0.5s ease;
 }
 
-.ambient-grid {
+/* Scroll-scrubbed background — one flat accent panel revealed through the
+   frame sequence in public/frames/. No blur and no second hue: the frames
+   already carry the shape, so the fill stays a single structural colour. */
+.scroll-bg {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 0;
-  /* One soft radial wash instead of a tiled dot/line field, which is a
-     generated-UI signature rather than structure. */
-  background-image: radial-gradient(ellipse 90% 60% at 50% 0%, rgba(31, 41, 55, 0.5), transparent 70%);
+  /* Negative z-index paints it above the canvas ground and below every in-flow
+     block, so the artwork never crosses text. */
+  z-index: -1;
+  background-color: var(--accent-blue);
+  /* Stays hidden until the first frame is set: an unset --scroll-frame leaves
+     mask-image at `none`, which would flash a solid full-bleed accent wash. */
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+  /* `contain`, not `cover`: covering a 3:2 frame on a phone-width viewport
+     cropped the mark in half. */
+  -webkit-mask-image: var(--scroll-frame);
+  mask-image: var(--scroll-frame);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
-[data-theme="light"] .ambient-grid {
-  background-image: radial-gradient(ellipse 90% 60% at 50% 0%, rgba(209, 213, 219, 0.55), transparent 70%);
+.scroll-bg.active {
+  /* Far enough up the range that the reveal carries the section it sits behind;
+     past ~0.75 the mark starts competing with the card fills. */
+  opacity: 0.6;
 }
 
-.ambient-glows {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.glow {
-  position: absolute;
-  border-radius: var(--radius-full);
-  filter: blur(140px);
-  opacity: 0.12;
-}
-
-.glow-1 {
-  width: 600px;
-  height: 600px;
-  background: var(--accent-blue);
-  top: -10%;
-  right: -5%;
-}
-
-.glow-2 {
-  width: 500px;
-  height: 500px;
-  /* One accent hue for the whole ambient field: the violet second hue was the
-     palette tell, and the blue reads as the same light source. */
-  background: var(--accent-blue);
-  opacity: 0.07;
-  bottom: -10%;
-  left: -5%;
+/* The light ground is far brighter than #0D1117, so the same alpha would read
+   as roughly twice the mark. */
+[data-theme="light"] .scroll-bg.active {
+  opacity: 0.32;
 }
 
 /* ==========================================================================
